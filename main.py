@@ -10,9 +10,11 @@ while run:
     pygame.time.delay(100)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            print("See you next time!")
             run = False
-            print(123)
-    print(pygame.mouse.get_pos())
-    print(pygame.mouse.get_pressed())
+
+    # Draw BG
+    pygame.draw.rect(window, pygame.Color(211, 211, 211), (0, 0, 1200, 1000))
+    pygame.display.update()
 
 pygame.quit()

@@ -1,3 +1,3 @@
 # CHESS
 
-Chess game using pyfame
+Chess game using pygame
