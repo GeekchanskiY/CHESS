@@ -24,7 +24,7 @@ class Pawn(Figure):
 
 
 class Bishop(Figure):
-    possible_moves = []
+    possible_moves = ["xy"]
 
     def __init__(self, pos_x, pos_y, bg_color, color):
         super().__init__(pos_x, pos_y, bg_color, color)
@@ -38,11 +38,15 @@ class Knight(Figure):
 
 
 class Rook(Figure):
+    possible_moves = ["x+", "y+"]
+
     def __init__(self, pos_x, pos_y, bg_color, color):
         super().__init__(pos_x, pos_y, bg_color, color)
 
 
 class Queen(Figure):
+    possible_moves = ["x+", "y+", "x"]
+
     def __init__(self, pos_x, pos_y, bg_color, color):
         super().__init__(pos_x, pos_y, bg_color, color)
 
