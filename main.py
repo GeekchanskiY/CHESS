@@ -1,10 +1,22 @@
+"""
+    Chess game written by DMT
+    https://github.com/GeekchanskiY/CHESS
+
+    base api for chess experiments
+
+    Future plans:
+        - add AI
+        - add chess.com support
+        - have fun :)
+"""
+
 import pygame
-from constants import Positions
-from classes import *
+from constants import Const
+from classes import Piece
 import os
 
 
-img_folder = (os.path.abspath("images/alpha/"))
+img_folder = (os.path.abspath("images/berlin/"))
 
 # game init and window options
 pygame.init()
@@ -16,20 +28,18 @@ size = 80
 ft = 0
 coord_list = []
 run = True
+pieces = []
 
-white_pawn_img = pygame.image.load(os.path.abspath("images/alpha/wP.png")).convert_alpha()
-white_king_img = pygame.image.load(os.path.abspath("images/alpha/wK.png")).convert_alpha()
-white_queen_img = pygame.image.load(os.path.abspath("images/alpha/wQ.png")).convert_alpha()
-white_bishop_img = pygame.image.load(os.path.abspath("images/alpha/wB.png")).convert_alpha()
-white_knight_img = pygame.image.load(os.path.abspath("images/alpha/wN.png")).convert_alpha()
-white_rook_img = pygame.image.load(os.path.abspath("images/alpha/wR.png")).convert_alpha()
 
-black_pawn_img = pygame.image.load(os.path.abspath("images/alpha/bP.png")).convert_alpha()
-black_king_img = pygame.image.load(os.path.abspath("images/alpha/bK.png")).convert_alpha()
-black_queen_img = pygame.image.load(os.path.abspath("images/alpha/bQ.png")).convert_alpha()
-black_bishop_img = pygame.image.load(os.path.abspath("images/alpha/bB.png")).convert_alpha()
-black_knight_img = pygame.image.load(os.path.abspath("images/alpha/bN.png")).convert_alpha()
-black_rook_img = pygame.image.load(os.path.abspath("images/alpha/bR.png")).convert_alpha()
+def create_figure_instances(start_positions):
+    for pos in start_positions:
+        for i in Const.positions:
+            if i[0] == pos[2:4]:
+                z = Piece(i[1][0], i[2][1], pos[0], pos[1], img_folder)
+                pieces.append(z)
+
+
+create_figure_instances(Const.start_positions)
 
 
 def draw_board():
@@ -50,32 +60,31 @@ def draw_board():
 
 def mouse_pos():
     pos = pygame.mouse.get_pos()
-    cell_pos = Positions.positions
-    for i in cell_pos:
+    for i in Const.positions:
         if i[1][0] < pos[0] < i[2][0]:
             if i[1][1] > pos[1] > i[2][1]:
                 print(i[0])
 
 
+def mouse_down():
+    mouse_pos()
+
+
+def draw_figures():
+    for piece in pieces:
+        window.blit(pygame.image.load(piece.img), (piece.pos_x, piece.pos_y))
+
+
 while run:
-    pygame.time.delay(100)
+    pygame.time.delay(20)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-
             run = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_down()
 
     draw_board()
-    ft = 1
-    window.blit(white_pawn_img, (80, 560))
-    window.blit(white_pawn_img, (160, 560))
-    window.blit(white_pawn_img, (240, 560))
-    window.blit(white_pawn_img, (320, 560))
-    window.blit(white_pawn_img, (400, 560))
-    window.blit(white_pawn_img, (480, 560))
-    window.blit(white_pawn_img, (560, 560))
-    window.blit(white_pawn_img, (640, 560))
-
-    mouse_pos()
+    draw_figures()
     # Updating display
     pygame.display.update()
 
