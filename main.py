@@ -1,6 +1,8 @@
 import pygame
+from constants import Positions
 from classes import *
 import os
+
 
 img_folder = (os.path.abspath("images/alpha/"))
 
@@ -46,11 +48,20 @@ def draw_board():
         cnt -= 1
 
 
+def mouse_pos():
+    pos = pygame.mouse.get_pos()
+    cell_pos = Positions.positions
+    for i in cell_pos:
+        if i[1][0] < pos[0] < i[2][0]:
+            if i[1][1] > pos[1] > i[2][1]:
+                print(i[0])
+
+
 while run:
     pygame.time.delay(100)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            print("See you next time!")
+
             run = False
 
     draw_board()
@@ -64,8 +75,9 @@ while run:
     window.blit(white_pawn_img, (560, 560))
     window.blit(white_pawn_img, (640, 560))
 
-    print(pygame.mouse.get_pos())
+    mouse_pos()
     # Updating display
     pygame.display.update()
 
+print("See you next time!")
 pygame.quit()
