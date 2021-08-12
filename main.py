@@ -19,8 +19,9 @@ ft = 0
 coord_list = []
 run = True
 pieces = []
-
 selected_piece = None
+possible_moves = None
+dragging = False
 
 piece_names = [
         ["P", "Pawn"],
@@ -31,12 +32,25 @@ piece_names = [
         ["N", "Knight"]
     ]
 
+
 start_positions = [
         'wPA2', 'wPB2', "wPC2", "wPD2", "wPE2", "wPF2", "wPG2", "wPH2",
         'wRA1', "wNB1", "wBC1", "wQD1", "wKE1", "wBF1", "wNG1", "wRH1",
         'bPA7', 'bPB7', "bPC7", "bPD7", "bPE7", "bPF7", "bPG7", "bPH7",
         'bRA8', "bNB8", "bBC8", "bQD8", "bKE8", "bBF8", "bNG8", "bRH8",
     ]
+
+field_names_x = {
+    "A": 1,
+    "B": 2,
+    "C": 3,
+    "D": 4,
+    "E": 5,
+    "F": 6,
+    "G": 7,
+    "H": 8
+}
+field_names_x_rev = {value: key for key, value in field_names_x.items()}
 
 positions = [
         ["A1", [80, 720], [160, 640]],
@@ -106,23 +120,104 @@ positions = [
     ]
 
 img_folder = (os.path.abspath("images/berlin/"))
+dot_img = os.path.abspath("images/dot.png")
+
+
+def pawn_move(instance):
+    global possible_moves
+    possible_moves = []
+    forward1 = True
+    forward2 = False
+    pos = instance.pos_name
+    x_num = field_names_x.get(pos[0])
+    y_num = int(pos[1])
+    if instance.first_move:
+        forward2 = True
+    if instance.color == "w":
+        for piece in pieces:
+            if piece.pos_name == pos[0]+str(int(pos[1])+1):
+                forward1 = False
+                forward2 = False
+            if piece.pos_name == pos[0]+str(int(pos[1])+2):
+                forward2 = False
+            if piece.color is "b":
+                if x_num != 1:
+                    if piece.pos_name == field_names_x_rev.get(x_num - 1)+str(y_num+1):
+                        possible_moves.append(piece.pos_name)
+                if x_num != 8:
+                    if piece.pos_name == field_names_x_rev.get(x_num+1)+str(y_num+1):
+                        possible_moves.append(piece.pos_name)
+        if forward1:
+            possible_moves.append(pos[0]+str(int(pos[1])+1))
+        if forward2:
+            possible_moves.append(pos[0] + str(int(pos[1]) + 2))
+    if instance.color == "b":
+        for piece in pieces:
+            if piece.pos_name == pos[0]+str(int(pos[1])-1):
+                forward1 = False
+                forward2 = False
+            if piece.pos_name == pos[0]+str(int(pos[1])-2):
+                forward2 = False
+            if piece.color is "w":
+                if x_num != 1:
+                    if piece.pos_name == field_names_x_rev.get(x_num - 1)+str(y_num-1):
+                        possible_moves.append(piece.pos_name)
+                if x_num != 8:
+                    if piece.pos_name == field_names_x_rev.get(x_num+1)+str(y_num-1):
+                        possible_moves.append(piece.pos_name)
+        if forward1:
+            possible_moves.append(pos[0]+str(int(pos[1]) - 1))
+        if forward2:
+            possible_moves.append(pos[0] + str(int(pos[1]) - 2))
+
+
+def king_move(instance):
+    pass
+
+
+def queen_move(instance):
+    pass
+
+
+def rook_move(instance):
+    pass
+
+
+def bishop_move(instance):
+    pass
+
+
+def knight_move(instance):
+    pass
+
+
+def hint():
+    global possible_moves
+    for move in possible_moves:
+        for pos in positions:
+            if pos[0] == move:
+                window.blit(pygame.image.load(dot_img), (pos[1][0], pos[2][1]))
 
 
 class Piece:
-    def __init__(self, pos_x, pos_y, color, figure_name, img_folder, pos_name):
+    def __init__(self, pos_x, pos_y, color, figure_name, image_folder, pos_name, piece_id):
+        self.id = piece_id
+        self.first_move = True
         self.color = color
         self.pos_x = int(pos_x)
         self.pos_y = int(pos_y)
         self.pos_name = pos_name
-        self.figure_name = figure_name
-        self.img = img_folder+"/{}.png".format(color+figure_name)
+        self.name = figure_name
+        self.img = image_folder+"/{}.png".format(color+figure_name)
         self.dead = False
 
     def update_pos(self, pos_name):
         for i in positions:
             if pos_name == i[0]:
+                self.first_move = False
                 self.pos_x = i[1][0]
                 self.pos_y = i[2][1]
+                self.pos_name = pos_name
 
 
 # game init and window options
@@ -133,10 +228,12 @@ pygame.display.set_caption("CHESS")
 
 
 def create_figure_instances(start_pos):
+    var = 1
     for pos in start_pos:
         for i in positions:
             if i[0] == pos[2:4]:
-                z = Piece(i[1][0], i[2][1], pos[0], pos[1], img_folder, pos[2:4])
+                z = Piece(i[1][0], i[2][1], pos[0], pos[1], img_folder, pos[2:4], var)
+                var += 1
                 pieces.append(z)
 
 
@@ -149,12 +246,8 @@ def draw_board():
         for z in range(1, 9):
             if cnt % 2 == 0:
                 pygame.draw.rect(window, pygame.Color(50, 50, 50), (size*z, size*i, size, size))
-                w = False
             else:
                 pygame.draw.rect(window, pygame.Color(255, 255, 255), (size*z, size*i, size, size))
-                w = True
-            if ft == 0:
-                coord_list.append({size * z, size * i})
             cnt += 1
         cnt -= 1
 
@@ -170,16 +263,37 @@ def mouse_pos():
 def mouse_down():
     pos = mouse_pos()
     found = False
+    moved = False
     global selected_piece
+    global possible_moves
     for piece in pieces:
         if pos == piece.pos_name:
-            found = True
             if selected_piece is None:
-                selected_piece = piece
+                selected_piece = piece.id
+                print(piece.name, "selected")
+                found = True
+                if piece.name == "P":
+                    pawn_move(piece)
+            else:
+                piece.pos_x = 1200
+                piece.dead = True
+                print(piece.name, piece.dead)
+
     if not found:
-        if selected_piece is not None:
-            selected_piece.update_pos(pos)
-            selected_piece = None
+        if selected_piece is None:
+            print(pos)
+        else:
+            for piece in pieces:
+                if piece.id == selected_piece:
+                    for move in possible_moves:
+                        if pos == move:
+                            piece.update_pos(pos)
+                            selected_piece = None
+                            moved = True
+
+    if moved:
+        possible_moves = None
+
 
 
 def draw_figures():
@@ -188,15 +302,21 @@ def draw_figures():
 
 
 while run:
-    pygame.time.delay(20)
+    pygame.time.delay(100)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_down()
+            if event.button == 1:
+                mouse_down()
+            elif event.button == 3:
+                selected_piece = None
+                possible_moves = None
 
     draw_board()
     draw_figures()
+    if possible_moves is not None:
+        hint()
     # Updating display
     pygame.display.update()
 
