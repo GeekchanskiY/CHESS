@@ -20,9 +20,11 @@ coord_list = []
 run = True
 pieces = []
 selected_piece = None
-possible_moves = None
 dragging = False
-
+possible_moves = []
+turn_log = ""
+white_dead_pieces_counter = 0
+black_dead_pieces_counter = 0
 piece_names = [
         ["P", "Pawn"],
         ["K", "King"],
@@ -118,14 +120,26 @@ positions = [
         ["H7", [640, 240], [720, 160]],
         ["H8", [640, 180], [720, 80]],
     ]
-
+black_dead_pieces_positions = {
+    1: (980, 80),
+    2: (980, 160),
+    3: (980, 240),
+    4: (980, 320),
+    5: (980, 400)
+}
+white_dead_pieces_positions = {
+    1: (900, 80),
+    2: (900, 160),
+    3: (900, 240),
+    4: (900, 320),
+    5: (900, 400)
+}
 img_folder = (os.path.abspath("images/berlin/"))
 dot_img = os.path.abspath("images/dot.png")
 
 
 def pawn_move(instance):
-    global possible_moves
-    possible_moves = []
+    moves = []
     forward1 = True
     forward2 = False
     pos = instance.pos_name
@@ -135,40 +149,43 @@ def pawn_move(instance):
         forward2 = True
     if instance.color == "w":
         for piece in pieces:
-            if piece.pos_name == pos[0]+str(int(pos[1])+1):
-                forward1 = False
-                forward2 = False
-            if piece.pos_name == pos[0]+str(int(pos[1])+2):
-                forward2 = False
-            if piece.color is "b":
-                if x_num != 1:
-                    if piece.pos_name == field_names_x_rev.get(x_num - 1)+str(y_num+1):
-                        possible_moves.append(piece.pos_name)
-                if x_num != 8:
-                    if piece.pos_name == field_names_x_rev.get(x_num+1)+str(y_num+1):
-                        possible_moves.append(piece.pos_name)
+            if not piece.dead:
+                if piece.pos_name == pos[0]+str(int(pos[1])+1):
+                    forward1 = False
+                    forward2 = False
+                if piece.pos_name == pos[0]+str(int(pos[1])+2):
+                    forward2 = False
+                if piece.color == "b":
+                    if x_num != 1:
+                        if piece.pos_name == field_names_x_rev.get(x_num - 1)+str(y_num+1):
+                            moves.append(piece.pos_name)
+                    if x_num != 8:
+                        if piece.pos_name == field_names_x_rev.get(x_num+1)+str(y_num+1):
+                            moves.append(piece.pos_name)
         if forward1:
-            possible_moves.append(pos[0]+str(int(pos[1])+1))
+            moves.append(pos[0]+str(int(pos[1])+1))
         if forward2:
-            possible_moves.append(pos[0] + str(int(pos[1]) + 2))
+            moves.append(pos[0] + str(int(pos[1]) + 2))
     if instance.color == "b":
         for piece in pieces:
-            if piece.pos_name == pos[0]+str(int(pos[1])-1):
-                forward1 = False
-                forward2 = False
-            if piece.pos_name == pos[0]+str(int(pos[1])-2):
-                forward2 = False
-            if piece.color is "w":
-                if x_num != 1:
-                    if piece.pos_name == field_names_x_rev.get(x_num - 1)+str(y_num-1):
-                        possible_moves.append(piece.pos_name)
-                if x_num != 8:
-                    if piece.pos_name == field_names_x_rev.get(x_num+1)+str(y_num-1):
-                        possible_moves.append(piece.pos_name)
+            if not piece.dead:
+                if piece.pos_name == pos[0]+str(int(pos[1])-1):
+                    forward1 = False
+                    forward2 = False
+                if piece.pos_name == pos[0]+str(int(pos[1])-2):
+                    forward2 = False
+                if piece.color == "w":
+                    if x_num != 1:
+                        if piece.pos_name == field_names_x_rev.get(x_num - 1)+str(y_num-1):
+                            moves.append(piece.pos_name)
+                    if x_num != 8:
+                        if piece.pos_name == field_names_x_rev.get(x_num+1)+str(y_num-1):
+                            moves.append(piece.pos_name)
         if forward1:
-            possible_moves.append(pos[0]+str(int(pos[1]) - 1))
+            moves.append(pos[0]+str(int(pos[1]) - 1))
         if forward2:
-            possible_moves.append(pos[0] + str(int(pos[1]) - 2))
+            moves.append(pos[0] + str(int(pos[1]) - 2))
+    return moves
 
 
 def king_move(instance):
@@ -191,9 +208,8 @@ def knight_move(instance):
     pass
 
 
-def hint():
-    global possible_moves
-    for move in possible_moves:
+def hint(instance):
+    for move in instance.possible_moves:
         for pos in positions:
             if pos[0] == move:
                 window.blit(pygame.image.load(dot_img), (pos[1][0], pos[2][1]))
@@ -209,7 +225,14 @@ class Piece:
         self.pos_name = pos_name
         self.name = figure_name
         self.img = image_folder+"/{}.png".format(color+figure_name)
+        self.possible_moves = []
+        self.what_can_i_do()
+        print(self.possible_moves)
         self.dead = False
+
+    def what_can_i_do(self):
+        if self.name == "P":
+            self.possible_moves = pawn_move(self)
 
     def update_pos(self, pos_name):
         for i in positions:
@@ -218,6 +241,26 @@ class Piece:
                 self.pos_x = i[1][0]
                 self.pos_y = i[2][1]
                 self.pos_name = pos_name
+
+    def move(self, pos_name):
+        updated = False
+        for pos in self.possible_moves:
+            if pos == pos_name:
+                self.update_pos(pos_name)
+                self.what_can_i_do()
+                updated = True
+        if updated:
+            print("I moved")
+            return True
+        else:
+            print("I cant do that")
+            return False
+
+    def die(self, pos_x, pos_y):
+        self.dead = True
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+        self.pos_name = "DEAD"
 
 
 # game init and window options
@@ -264,36 +307,37 @@ def mouse_down():
     pos = mouse_pos()
     found = False
     moved = False
+    global white_dead_pieces_counter
+    global white_dead_pieces_positions
+    global black_dead_pieces_counter
+    global black_dead_pieces_positions
     global selected_piece
-    global possible_moves
     for piece in pieces:
         if pos == piece.pos_name:
             if selected_piece is None:
-                selected_piece = piece.id
+                selected_piece = piece
                 print(piece.name, "selected")
                 found = True
-                if piece.name == "P":
-                    pawn_move(piece)
             else:
-                piece.pos_x = 1200
                 piece.dead = True
-                print(piece.name, piece.dead)
+                if piece.color == "w":
+                    white_dead_pieces_counter += 1
+                    dead_pos = white_dead_pieces_positions.get(white_dead_pieces_counter)
+                    piece.die(dead_pos[0], dead_pos[1])
+                else:
+                    black_dead_pieces_counter += 1
+                    dead_pos = black_dead_pieces_positions.get(black_dead_pieces_counter)
+                    piece.die(dead_pos[0], dead_pos[1])
 
     if not found:
         if selected_piece is None:
             print(pos)
         else:
-            for piece in pieces:
-                if piece.id == selected_piece:
-                    for move in possible_moves:
-                        if pos == move:
-                            piece.update_pos(pos)
-                            selected_piece = None
-                            moved = True
+            if selected_piece.move(pos):
+                moved = True
 
     if moved:
-        possible_moves = None
-
+        selected_piece = None
 
 
 def draw_figures():
@@ -315,8 +359,8 @@ while run:
 
     draw_board()
     draw_figures()
-    if possible_moves is not None:
-        hint()
+    if selected_piece is not None:
+        hint(selected_piece)
     # Updating display
     pygame.display.update()
 
