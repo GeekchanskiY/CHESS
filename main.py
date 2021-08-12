@@ -6,6 +6,7 @@
 
     Future plans:
         - add AI
+        - add freaking en passant rule
         - add chess.com support
         - have fun :)
 """
@@ -14,6 +15,9 @@ import pygame
 import os
 
 # Constants
+
+turn = 0
+
 size = 80
 ft = 0
 coord_list = []
@@ -145,6 +149,8 @@ def pawn_move(instance):
     pos = instance.pos_name
     x_num = field_names_x.get(pos[0])
     y_num = int(pos[1])
+    global turn
+    print(f"Current_turn = {turn}")
     if instance.first_move:
         forward2 = True
     if instance.color == "w":
@@ -162,6 +168,7 @@ def pawn_move(instance):
                     if x_num != 8:
                         if piece.pos_name == field_names_x_rev.get(x_num+1)+str(y_num+1):
                             moves.append(piece.pos_name)
+                # en passant rule is not ready
         if forward1:
             moves.append(pos[0]+str(int(pos[1])+1))
         if forward2:
@@ -259,7 +266,7 @@ class Piece:
         """
         for i in positions:
             if pos_name == i[0]:
-                self.first_move = False
+                self.first_move = 0
                 self.pos_x = i[1][0]
                 self.pos_y = i[2][1]
                 self.pos_name = pos_name
@@ -271,6 +278,7 @@ class Piece:
         :return:
         """
         global selected_piece
+        global turn
         updated = False
         for pos in self.possible_moves:
             if pos == pos_name:
@@ -279,14 +287,16 @@ class Piece:
                     if piece.pos_name == pos_name and not piece.dead:
                         piece.die()
                 self.update_pos(pos_name)
+                if self.first_move:
+                    self.first_move = turn
+
+                turn += 1
                 self.what_can_i_do()
                 updated = True
         if updated:
             selected_piece = None
-            print("I moved")
             return True
         else:
-            print("I cant do that")
             return False
 
     def die(self):
@@ -361,7 +371,7 @@ def mouse_down():
         if pos == piece.pos_name:
             if selected_piece is None:
                 selected_piece = piece
-                print(piece.name, "selected")
+                print(piece.first_move, "selected")
                 found = True
             else:
                 selected_piece.move(pos)
