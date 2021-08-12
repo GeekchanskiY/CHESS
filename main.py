@@ -216,7 +216,20 @@ def hint(instance):
 
 
 class Piece:
+    """
+        Main piece class with all it's actions
+    """
     def __init__(self, pos_x, pos_y, color, figure_name, image_folder, pos_name, piece_id):
+        """
+            Creating piece
+        :param pos_x:
+        :param pos_y:
+        :param color:
+        :param figure_name:
+        :param image_folder:
+        :param pos_name:
+        :param piece_id:
+        """
         self.id = piece_id
         self.first_move = True
         self.color = color
@@ -231,10 +244,19 @@ class Piece:
         self.dead = False
 
     def what_can_i_do(self):
+        """
+            analyzing possible moves
+        :return:
+        """
         if self.name == "P":
             self.possible_moves = pawn_move(self)
 
     def update_pos(self, pos_name):
+        """
+            Updating piece position
+        :param pos_name:
+        :return:
+        """
         for i in positions:
             if pos_name == i[0]:
                 self.first_move = False
@@ -243,24 +265,52 @@ class Piece:
                 self.pos_name = pos_name
 
     def move(self, pos_name):
+        """
+            Moving piece with build-in validation
+        :param pos_name:
+        :return:
+        """
+        global selected_piece
         updated = False
         for pos in self.possible_moves:
             if pos == pos_name:
+                # Checking if move kills another piece
+                for piece in pieces:
+                    if piece.pos_name == pos_name and not piece.dead:
+                        piece.die()
                 self.update_pos(pos_name)
                 self.what_can_i_do()
                 updated = True
         if updated:
+            selected_piece = None
             print("I moved")
             return True
         else:
             print("I cant do that")
             return False
 
-    def die(self, pos_x, pos_y):
+    def die(self):
+        """
+            Removing piece from board with build-in validation
+        :return:
+        """
+        global white_dead_pieces_counter
+        global black_dead_pieces_positions
+        global white_dead_pieces_positions
+        global black_dead_pieces_counter
         self.dead = True
-        self.pos_x = pos_x
-        self.pos_y = pos_y
+        if self.color == "w":
+            white_dead_pieces_counter += 1
+            new_pos = white_dead_pieces_positions.get(white_dead_pieces_counter)
+            self.pos_x = new_pos[0]
+            self.pos_y = new_pos[1]
+        else:
+            black_dead_pieces_counter += 1
+            new_pos = black_dead_pieces_positions.get(black_dead_pieces_counter)
+            self.pos_x = new_pos[0]
+            self.pos_y = new_pos[1]
         self.pos_name = "DEAD"
+        print("Oh no, im dead :(")
 
 
 # game init and window options
@@ -306,11 +356,6 @@ def mouse_pos():
 def mouse_down():
     pos = mouse_pos()
     found = False
-    moved = False
-    global white_dead_pieces_counter
-    global white_dead_pieces_positions
-    global black_dead_pieces_counter
-    global black_dead_pieces_positions
     global selected_piece
     for piece in pieces:
         if pos == piece.pos_name:
@@ -319,25 +364,12 @@ def mouse_down():
                 print(piece.name, "selected")
                 found = True
             else:
-                piece.dead = True
-                if piece.color == "w":
-                    white_dead_pieces_counter += 1
-                    dead_pos = white_dead_pieces_positions.get(white_dead_pieces_counter)
-                    piece.die(dead_pos[0], dead_pos[1])
-                else:
-                    black_dead_pieces_counter += 1
-                    dead_pos = black_dead_pieces_positions.get(black_dead_pieces_counter)
-                    piece.die(dead_pos[0], dead_pos[1])
-
+                selected_piece.move(pos)
     if not found:
         if selected_piece is None:
             print(pos)
         else:
-            if selected_piece.move(pos):
-                moved = True
-
-    if moved:
-        selected_piece = None
+            selected_piece.move(pos)
 
 
 def draw_figures():
@@ -359,6 +391,8 @@ while run:
 
     draw_board()
     draw_figures()
+
+    # Creating hints
     if selected_piece is not None:
         hint(selected_piece)
     # Updating display
