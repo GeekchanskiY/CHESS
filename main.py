@@ -6,40 +6,58 @@
 
     Future plan:
         - Finish piece movement logic
-        - add freaking "en passant" rule
+        - add "en passant" rule
 
         - add AI
-        - add chess.com support
+        - add chess.com support for AI learning by analyzing games
+        - Create vk api for playing with friends
         - have fun :)
+
+
 """
 
 import pygame
 import os
+#
+#   Constants
+#
 
-# Constants
-
+# Current turn constant for AI, log and "en passant" rule
 turn = 0
 
+# Size of cell. By default it's 80 because of piece images resolution.
 size = 80
-ft = 0
+
+# App running
 run = True
+
+# List of all pieces in game
 pieces = []
+
+# Argument for making a link on current selected piece
 selected_piece = None
+
+# Argument for future smooth dragging animation
 dragging = False
-possible_moves = []
+
+# Turn log for AI
 turn_log = ""
+
+# Counter of dead pieces for correct rendering
 white_dead_pieces_counter = 0
 black_dead_pieces_counter = 0
-piece_names = [
-        ["P", "Pawn"],
-        ["K", "King"],
-        ["Q", "Queen"],
-        ["R", "Rook"],
-        ["B", "Bishop"],
-        ["N", "Knight"]
-    ]
 
+# Pieces short and full names
+piece_names = {
+    "P": "Pawn",
+    "K": "King",
+    "Q": "Queen",
+    "R": "Rook",
+    "B": "Bishop",
+    "N": "Knight"
+}
 
+# Const for first creating pieces
 start_positions = [
         'wP12', 'wP22', "wP32", "wP42", "wP52", "wP62", "wP72", "wP82",
         'wR11', "wN21", "wB31", "wQ41", "wK51", "wB61", "wN71", "wR81",
@@ -47,6 +65,7 @@ start_positions = [
         'bR18', "bN28", "bB38", "bQ48", "bK58", "bB68", "bN78", "bR88",
     ]
 
+# Dictionaries for translating numeric pos name to classic and vice versa
 field_names_x = {
     "A": 1,
     "B": 2,
@@ -61,7 +80,7 @@ field_names_x_rev = {value: key for key, value in field_names_x.items()}
 
 
 positions = {}
-cnt = 0
+
 
 # Generating coordinates
 for z in range(1, 9):
@@ -84,6 +103,7 @@ white_dead_pieces_positions = {
     5: (900, 400)
 }
 
+# Image folders
 img_folder = (os.path.abspath("images/berlin/"))
 dot_img = os.path.abspath("images/dot.png")
 
@@ -157,7 +177,8 @@ def knight_move(instance):
     pass
 
 
-def hint(instance):
+def draw_hints(instance):
+    # Hint drawing for each possible move of selected piece. Also useful for creating logic.
     for move in instance.moves:
         window.blit(pygame.image.load(dot_img), (positions.get(move)[0], positions.get(move)[2]))
 
@@ -235,10 +256,13 @@ class Piece:
         self.dead = True
 
     def get_pos_coord(self):
-        return positions.get(self.pos)[0], positions.get(self.pos)[2]
+        """
 
-    def draw(self):
-        window.blit(pygame.image.load(self.img), (self.get_pos_coord()))
+            Method for returning position coordinates of each piece
+
+        :return:
+        """
+        return positions.get(self.pos)[0], positions.get(self.pos)[2]
 
 
 # game init and window options
@@ -269,15 +293,27 @@ def draw_board():
 
 
 def mouse_pos():
-    pos = pygame.mouse.get_pos()
+    """
+
+        Function for finding the cell on which the mouse is located
+
+    :return:
+    """
+    mouse_position = pygame.mouse.get_pos()
     for p in positions:
-        i = positions.get(p)
-        if int(i[0]) < pos[0] < int(i[1]):
-            if int(i[2]) < pos[1] < int(i[3]):
+        cell = positions.get(p)
+        if int(cell[0]) < mouse_position[0] < int(cell[1]):
+            if int(cell[2]) < mouse_position[1] < int(cell[3]):
                 return p
 
 
 def mouse_down():
+    """
+
+        Logic for LMB click
+
+    :return:
+    """
     global selected_piece
     pos = mouse_pos()
     if selected_piece is None:
@@ -290,30 +326,38 @@ def mouse_down():
 
 
 def draw_figures():
+    # Rendering of each piece
     for piece in pieces:
-        piece.draw()
+        window.blit(pygame.image.load(piece.img), (piece.get_pos_coord()))
 
 
 while run:
+    # Delay for reducing the CPU load
     pygame.time.delay(100)
+
+    # Event listener
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            # Pausing the main game loop on quitting the game
             run = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
+                # LMB click logic
                 mouse_down()
             elif event.button == 3:
+                # RMB click logic
                 if selected_piece is not None:
                     print(selected_piece.color, selected_piece.name, "Deselected")
                     selected_piece = None
-
+    # Calling main piece and board rendering functions
     draw_board()
     draw_figures()
     # Creating hints
     if selected_piece is not None:
-        hint(selected_piece)
+        draw_hints(selected_piece)
     # Updating display
     pygame.display.update()
 
 print("See you next time!")
+# Quitting the app
 pygame.quit()
