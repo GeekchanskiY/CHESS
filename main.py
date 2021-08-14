@@ -62,6 +62,7 @@ field_names_x_rev = {value: key for key, value in field_names_x.items()}
 
 positions = {}
 cnt = 0
+
 # Generating coordinates
 for z in range(1, 9):
     for i in range(1, 9):
@@ -93,6 +94,10 @@ def pawn_move(instance):
     f2 = True
     for piece in pieces:
         if instance.color == "w":
+            if piece.pos == instance.pos + 11:
+                moves.append(piece.pos)
+            if piece.pos == instance.pos - 9:
+                moves.append(piece.pos)
             if instance.moved is False:
                 if piece.pos == instance.pos + 1:
                     f1 = False
@@ -104,12 +109,31 @@ def pawn_move(instance):
                     f1 = False
                 f2 = False
         else:
-            pass
+            if piece.pos == instance.pos + 9:
+                moves.append(piece.pos)
+            if piece.pos == instance.pos - 11:
+                moves.append(piece.pos)
+            if instance.moved:
+                f2 = False
+                if piece.pos == instance.pos - 1:
+                    f1 = False
+            else:
+                if piece.pos == instance.pos - 1:
+                    f1 = False
+                    f2 = False
+                if piece.pos == instance.pos - 2:
+                    f2 = False
 
     if f1:
-        moves.append(instance.pos + 1)
+        if instance.color == "w":
+            moves.append(instance.pos + 1)
+        else:
+            moves.append(instance.pos - 1)
     if f2:
-        moves.append(instance.pos + 2)
+        if instance.color == "w":
+            moves.append(instance.pos + 2)
+        else:
+            moves.append(instance.pos - 2)
     return moves
 
 
