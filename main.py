@@ -87,22 +87,6 @@ for z in range(1, 9):
     for i in range(1, 9):
         positions[int(str(z) + str(9-i))] = [size * z, size * (z+1), size * i, size * (i+1)]
 
-black_dead_pieces_positions = {
-    1: (980, 80),
-    2: (980, 160),
-    3: (980, 240),
-    4: (980, 320),
-    5: (980, 400)
-}
-
-white_dead_pieces_positions = {
-    1: (900, 80),
-    2: (900, 160),
-    3: (900, 240),
-    4: (900, 320),
-    5: (900, 400)
-}
-
 # Image folders
 img_folder = (os.path.abspath("images/berlin/"))
 dot_img = os.path.abspath("images/dot.png")
@@ -153,6 +137,12 @@ def pawn_move(instance):
                     moves.append(instance.pos + 11)
                 else:
                     moves.append(instance.pos + 9)
+        if piece.pos == instance.pos - 10:
+            if piece.name == "P" and piece.last_turn == turn - 1 and piece.color != instance.color:
+                if instance.color == "w":
+                    moves.append(instance.pos - 9)
+                else:
+                    moves.append(instance.pos - 11)
 
     if f1:
         if instance.color == "w":
@@ -273,7 +263,7 @@ class Piece:
                     self.create_img()
                     self.what_can_i_do()
             else:
-                if self.color % 10 == 1:
+                if self.pos % 10 == 1:
                     self.name = "Q"
                     self.create_img()
                     self.what_can_i_do()
@@ -360,9 +350,7 @@ def mouse_down():
                 selected_piece = piece
                 print(piece.color, piece.name, "Selected")
     else:
-        if selected_piece.move(pos):
-            for piece in pieces:
-                piece
+        selected_piece.move(pos)
 
 
 def draw_figures():
