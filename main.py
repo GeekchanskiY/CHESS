@@ -113,12 +113,13 @@ def pawn_move(instance):
     f1 = True
     f2 = True
     for piece in pieces:
+        # Pawn movement and killing logic
         if instance.color == "w":
             if piece.pos == instance.pos + 11:
                 moves.append(piece.pos)
             if piece.pos == instance.pos - 9:
                 moves.append(piece.pos)
-            if instance.moved is False:
+            if instance.last_turn is None:
                 if piece.pos == instance.pos + 1:
                     f1 = False
                     f2 = False
@@ -133,16 +134,25 @@ def pawn_move(instance):
                 moves.append(piece.pos)
             if piece.pos == instance.pos - 11:
                 moves.append(piece.pos)
-            if instance.moved:
-                f2 = False
-                if piece.pos == instance.pos - 1:
-                    f1 = False
-            else:
+            if instance.last_turn is None:
                 if piece.pos == instance.pos - 1:
                     f1 = False
                     f2 = False
                 if piece.pos == instance.pos - 2:
                     f2 = False
+            else:
+                f2 = False
+                if piece.pos == instance.pos - 1:
+                    f1 = False
+
+
+        # En passant rule
+        if piece.pos == instance.pos + 10:
+            if piece.name == "P" and piece.last_turn == turn - 1 and piece.color != instance.color:
+                if instance.color == "w":
+                    moves.append(instance.pos + 11)
+                else:
+                    moves.append(instance.pos + 9)
 
     if f1:
         if instance.color == "w":
@@ -179,8 +189,9 @@ def knight_move(instance):
 
 def draw_hints(instance):
     # Hint drawing for each possible move of selected piece. Also useful for creating logic.
-    for move in instance.moves:
-        window.blit(pygame.image.load(dot_img), (positions.get(move)[0], positions.get(move)[2]))
+    if instance.moves is not None:
+        for move in instance.moves:
+            window.blit(pygame.image.load(dot_img), (positions.get(move)[0], positions.get(move)[2]))
 
 
 class Piece:
@@ -189,10 +200,7 @@ class Piece:
 
         Color, name, dead and position are for rendering and logic
 
-        moved is an argument for AI and pawn logic
-
-        first turn is also an argument for AI, but also it's
-        for an "en passant" rule in chess
+        last_turn is an argument for AI and pawn logic (1st move & en passant rule)
         To read more about the "en passant" rule you can visit:
             https://en.wikipedia.org/wiki/En_passant
 
@@ -204,13 +212,15 @@ class Piece:
         self.name = name
         self.pos = int(pos)
 
-        self.dead = True
-        self.moved = False
-        self.first_turn = None
+        self.last_turn = None
 
-        self.moves = self.what_can_i_do()
+        self.moves = None
 
-        self.img = img_folder+"/{}.png".format(self.color+self.name)
+        self.img = None
+        self.create_img()
+
+    def create_img(self):
+        self.img = img_folder + "/{}.png".format(self.color + self.name)
 
     def what_can_i_do(self):
         """
@@ -219,7 +229,7 @@ class Piece:
 
         :return:
         """
-        return {
+        self.moves = {
             "P": pawn_move(self),
             "K": king_move(self),
             "Q": queen_move(self),
@@ -227,6 +237,7 @@ class Piece:
             "B": bishop_move(self),
             "N": knight_move(self),
         }.get(self.name)
+        return self.moves
 
     def move(self, pos):
         """
@@ -239,12 +250,35 @@ class Piece:
         :return:
         """
         global selected_piece
-        for move in self.what_can_i_do():
+        global turn
+        moved = False
+        for move in self.moves:
             if pos == move:
+                moved = True
+                for piece in pieces:
+                    if pos == piece.pos:
+                        piece.die()
                 self.pos = pos
-                self.moved = True
-                self.moves = self.what_can_i_do()
                 selected_piece = None
+                self.last_turn = turn
+                turn += 1
+                for piece in pieces:
+                    piece.what_can_i_do()
+
+        # Pawn to Queen
+        if self.name == "P":
+            if self.color == "w":
+                if self.pos % 10 == 8:
+                    self.name = "Q"
+                    self.create_img()
+                    self.what_can_i_do()
+            else:
+                if self.color % 10 == 1:
+                    self.name = "Q"
+                    self.create_img()
+                    self.what_can_i_do()
+
+        return moved
 
     def die(self):
         """
@@ -253,7 +287,8 @@ class Piece:
 
         :return:
         """
-        self.dead = True
+        global pieces
+        pieces.remove(self)
 
     def get_pos_coord(self):
         """
@@ -275,6 +310,9 @@ pygame.display.set_caption("CHESS")
 def create_figure_instances(start_pos):
     for pos in start_pos:
         pieces.append(Piece(pos[0], pos[1], pos[2:4]))
+
+    for piece in pieces:
+        piece.what_can_i_do()
 
 
 create_figure_instances(start_positions)
@@ -322,7 +360,9 @@ def mouse_down():
                 selected_piece = piece
                 print(piece.color, piece.name, "Selected")
     else:
-        selected_piece.move(pos)
+        if selected_piece.move(pos):
+            for piece in pieces:
+                piece
 
 
 def draw_figures():
