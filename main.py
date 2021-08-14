@@ -4,9 +4,11 @@
 
     base api for chess experiments
 
-    Future plans:
+    Future plan:
+        - Finish piece movement logic
+        - add freaking "en passant" rule
+
         - add AI
-        - add freaking en passant rule
         - add chess.com support
         - have fun :)
 """
@@ -63,8 +65,8 @@ cnt = 0
 # Generating coordinates
 for z in range(1, 9):
     for i in range(1, 9):
-        positions[str(z) + str(9-i)] = [size * z, size * (z+1), size * i, size * (i+1)]
-print(positions)
+        positions[int(str(z) + str(9-i))] = [size * z, size * (z+1), size * i, size * (i+1)]
+
 black_dead_pieces_positions = {
     1: (980, 80),
     2: (980, 160),
@@ -72,6 +74,7 @@ black_dead_pieces_positions = {
     4: (980, 320),
     5: (980, 400)
 }
+
 white_dead_pieces_positions = {
     1: (900, 80),
     2: (900, 160),
@@ -79,12 +82,34 @@ white_dead_pieces_positions = {
     4: (900, 320),
     5: (900, 400)
 }
+
 img_folder = (os.path.abspath("images/berlin/"))
 dot_img = os.path.abspath("images/dot.png")
 
 
 def pawn_move(instance):
     moves = []
+    f1 = True
+    f2 = True
+    for piece in pieces:
+        if instance.color == "w":
+            if instance.moved is False:
+                if piece.pos == instance.pos + 1:
+                    f1 = False
+                    f2 = False
+                if piece.pos == instance.pos + 2:
+                    f2 = False
+            else:
+                if piece.pos == instance.pos + 1:
+                    f1 = False
+                f2 = False
+        else:
+            pass
+
+    if f1:
+        moves.append(instance.pos + 1)
+    if f2:
+        moves.append(instance.pos + 2)
     return moves
 
 
@@ -109,19 +134,37 @@ def knight_move(instance):
 
 
 def hint(instance):
-    pass
+    for move in instance.moves:
+        window.blit(pygame.image.load(dot_img), (positions.get(move)[0], positions.get(move)[2]))
 
 
 class Piece:
     """
-        Main piece class with all it's actions
+        Main dynamic piece class with all it's actions
+
+        Color, name, dead and position are for rendering and logic
+
+        moved is an argument for AI and pawn logic
+
+        first turn is also an argument for AI, but also it's
+        for an "en passant" rule in chess
+        To read more about the "en passant" rule you can visit:
+            https://en.wikipedia.org/wiki/En_passant
+
+        img argument is for holding rendering image only
+
     """
     def __init__(self, color, name, pos):
-        self.dead = True
-        self.moved = False
         self.color = color
         self.name = name
-        self.pos = pos
+        self.pos = int(pos)
+
+        self.dead = True
+        self.moved = False
+        self.first_turn = None
+
+        self.moves = self.what_can_i_do()
+
         self.img = img_folder+"/{}.png".format(self.color+self.name)
 
     def what_can_i_do(self):
@@ -131,27 +174,32 @@ class Piece:
 
         :return:
         """
-        pass
+        return {
+            "P": pawn_move(self),
+            "K": king_move(self),
+            "Q": queen_move(self),
+            "R": rook_move(self),
+            "B": bishop_move(self),
+            "N": knight_move(self),
+        }.get(self.name)
 
-    def update_pos(self):
-        """
-
-        Updating piece position
-
-        :param pos_name:
-        :return:
-        """
-        pass
-
-    def move(self):
+    def move(self, pos):
         """
 
         Moving piece with build-in validation
+        also "Killing" validation is in the movement method
+        after moving deselecting piece
 
-        :param pos_name:
+        :param pos:
         :return:
         """
-        pass
+        global selected_piece
+        for move in self.what_can_i_do():
+            if pos == move:
+                self.pos = pos
+                self.moved = True
+                self.moves = self.what_can_i_do()
+                selected_piece = None
 
     def die(self):
         """
@@ -160,7 +208,7 @@ class Piece:
 
         :return:
         """
-        pass
+        self.dead = True
 
     def get_pos_coord(self):
         return positions.get(self.pos)[0], positions.get(self.pos)[2]
@@ -177,7 +225,6 @@ pygame.display.set_caption("CHESS")
 
 
 def create_figure_instances(start_pos):
-
     for pos in start_pos:
         pieces.append(Piece(pos[0], pos[1], pos[2:4]))
 
@@ -199,14 +246,23 @@ def draw_board():
 
 def mouse_pos():
     pos = pygame.mouse.get_pos()
-    for z in positions:
-        i = positions.get(z)
+    for p in positions:
+        i = positions.get(p)
         if int(i[0]) < pos[0] < int(i[1]):
             if int(i[2]) < pos[1] < int(i[3]):
-                return z
+                return p
+
 
 def mouse_down():
-    print(mouse_pos())
+    global selected_piece
+    pos = mouse_pos()
+    if selected_piece is None:
+        for piece in pieces:
+            if pos == piece.pos:
+                selected_piece = piece
+                print(piece.color, piece.name, "Selected")
+    else:
+        selected_piece.move(pos)
 
 
 def draw_figures():
@@ -223,8 +279,9 @@ while run:
             if event.button == 1:
                 mouse_down()
             elif event.button == 3:
-                selected_piece = None
-                possible_moves = None
+                if selected_piece is not None:
+                    print(selected_piece.color, selected_piece.name, "Deselected")
+                    selected_piece = None
 
     draw_board()
     draw_figures()
