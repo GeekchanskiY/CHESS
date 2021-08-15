@@ -92,6 +92,11 @@ img_folder = (os.path.abspath("images/berlin/"))
 dot_img = os.path.abspath("images/dot.png")
 
 
+# Movement functions. It takes an instance and returns a list of lists with 2 elements.
+# 1 - possible move
+# 2 - returns piece that dies after possible move. None if there's no such piece
+
+
 def pawn_move(instance):
     moves = []
     f1 = True
@@ -100,9 +105,9 @@ def pawn_move(instance):
         # Pawn movement and killing logic
         if instance.color == "w":
             if piece.pos == instance.pos + 11:
-                moves.append(piece.pos)
+                moves.append([piece.pos, piece])
             if piece.pos == instance.pos - 9:
-                moves.append(piece.pos)
+                moves.append([piece.pos, piece])
             if instance.last_turn is None:
                 if piece.pos == instance.pos + 1:
                     f1 = False
@@ -115,9 +120,9 @@ def pawn_move(instance):
                 f2 = False
         else:
             if piece.pos == instance.pos + 9:
-                moves.append(piece.pos)
+                moves.append([piece.pos, piece])
             if piece.pos == instance.pos - 11:
-                moves.append(piece.pos)
+                moves.append([piece.pos, piece])
             if instance.last_turn is None:
                 if piece.pos == instance.pos - 1:
                     f1 = False
@@ -134,26 +139,26 @@ def pawn_move(instance):
         if piece.pos == instance.pos + 10:
             if piece.name == "P" and piece.last_turn == turn - 1 and piece.color != instance.color:
                 if instance.color == "w":
-                    moves.append(instance.pos + 11)
+                    moves.append([instance.pos + 11, piece])
                 else:
-                    moves.append(instance.pos + 9)
+                    moves.append([instance.pos + 9, piece])
         if piece.pos == instance.pos - 10:
             if piece.name == "P" and piece.last_turn == turn - 1 and piece.color != instance.color:
                 if instance.color == "w":
-                    moves.append(instance.pos - 9)
+                    moves.append([instance.pos - 9, piece])
                 else:
-                    moves.append(instance.pos - 11)
+                    moves.append([instance.pos - 11, piece])
 
     if f1:
         if instance.color == "w":
-            moves.append(instance.pos + 1)
+            moves.append([instance.pos + 1, None])
         else:
-            moves.append(instance.pos - 1)
+            moves.append([instance.pos - 1, None])
     if f2:
         if instance.color == "w":
-            moves.append(instance.pos + 2)
+            moves.append([instance.pos + 2, None])
         else:
-            moves.append(instance.pos - 2)
+            moves.append([instance.pos - 2, None])
     return moves
 
 
@@ -170,7 +175,33 @@ def rook_move(instance):
 
 
 def bishop_move(instance):
-    pass
+    moves = []
+    temp_pos = instance.pos
+
+    while True:
+        fl1 = True
+        fr1 = True
+        bl1 = True
+        br1 = True
+
+        if temp_pos % 10 == 8:
+            fl1 = False
+            fr1 = False
+        if temp_pos % 10 == 1:
+            bl1 = False
+            br1 = False
+        if temp_pos < 19:
+            fl1 = False
+            bl1 = False
+        if temp_pos > 80:
+            fr1 = False
+            br1 = False
+
+
+        if not fl1 and not fr1 and not bl1 and not  br1:
+            break
+
+
 
 
 def knight_move(instance):
@@ -181,7 +212,7 @@ def draw_hints(instance):
     # Hint drawing for each possible move of selected piece. Also useful for creating logic.
     if instance.moves is not None:
         for move in instance.moves:
-            window.blit(pygame.image.load(dot_img), (positions.get(move)[0], positions.get(move)[2]))
+            window.blit(pygame.image.load(dot_img), (positions.get(move[0])[0], positions.get(move[0])[2]))
 
 
 class Piece:
@@ -243,11 +274,10 @@ class Piece:
         global turn
         moved = False
         for move in self.moves:
-            if pos == move:
+            if pos == move[0]:
                 moved = True
-                for piece in pieces:
-                    if pos == piece.pos:
-                        piece.die()
+                if move[1] is not None:
+                    move[1].die()
                 self.pos = pos
                 selected_piece = None
                 self.last_turn = turn
