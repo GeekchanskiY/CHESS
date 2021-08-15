@@ -104,9 +104,9 @@ def pawn_move(instance):
     for piece in pieces:
         # Pawn movement and killing logic
         if instance.color == "w":
-            if piece.pos == instance.pos + 11:
+            if piece.pos == instance.pos + 11 and piece.color != instance.color:
                 moves.append([piece.pos, piece])
-            if piece.pos == instance.pos - 9:
+            if piece.pos == instance.pos - 9 and piece.color != instance.color:
                 moves.append([piece.pos, piece])
             if instance.last_turn is None:
                 if piece.pos == instance.pos + 1:
@@ -119,9 +119,9 @@ def pawn_move(instance):
                     f1 = False
                 f2 = False
         else:
-            if piece.pos == instance.pos + 9:
+            if piece.pos == instance.pos + 9 and piece.color != instance.color:
                 moves.append([piece.pos, piece])
-            if piece.pos == instance.pos - 11:
+            if piece.pos == instance.pos - 11 and piece.color != instance.color:
                 moves.append([piece.pos, piece])
             if instance.last_turn is None:
                 if piece.pos == instance.pos - 1:
@@ -167,41 +167,177 @@ def king_move(instance):
 
 
 def queen_move(instance):
-    pass
+    moves = []
+    for move in rook_move(instance):
+        moves.append(move)
+    for move in bishop_move(instance):
+        moves.append(move)
+    return moves
 
 
 def rook_move(instance):
-    pass
+    moves = []
+
+    forward = True
+    backward = True
+    left = True
+    right = True
+
+    if instance.pos % 10 == 8:
+        forward = False
+    if instance.pos % 10 == 1:
+        backward = False
+    if instance.pos >= 81:
+        right = False
+    if instance.pos <= 18:
+        left = False
+
+    if forward:
+        temp_pos = instance.pos + 1
+        found = False
+        while temp_pos % 10 <= 8 and not found:
+            for piece in pieces:
+                if piece.pos == temp_pos:
+                    if piece.color == instance.color:
+                        found = True
+                    else:
+                        moves.append([temp_pos, piece])
+                        found = True
+            if not found:
+                moves.append([temp_pos, None])
+                temp_pos += 1
+
+    if backward:
+        temp_pos = instance.pos - 1
+        found = False
+        while temp_pos % 10 >= 1 and not found:
+            for piece in pieces:
+                if piece.pos == temp_pos:
+                    if piece.color == instance.color:
+                        found = True
+                    else:
+                        moves.append([temp_pos, piece])
+                        found = True
+            if not found:
+                moves.append([temp_pos, None])
+                temp_pos -= 1
+
+    if right:
+        temp_pos = instance.pos + 10
+        found = False
+        while temp_pos <= 88 and not found:
+            for piece in pieces:
+                if piece.pos == temp_pos:
+                    if piece.color == instance.color:
+                        found = True
+                    else:
+                        moves.append([temp_pos, piece])
+                        found = True
+            if not found:
+                moves.append([temp_pos, None])
+                temp_pos += 10
+
+    if left:
+        temp_pos = instance.pos - 10
+        found = False
+        while temp_pos >= 11 and not found:
+            for piece in pieces:
+                if piece.pos == temp_pos:
+                    if piece.color == instance.color:
+                        found = True
+                    else:
+                        moves.append([temp_pos, piece])
+                        found = True
+            if not found:
+                moves.append([temp_pos, None])
+                temp_pos -= 10
+
+    return moves
 
 
 def bishop_move(instance):
     moves = []
-    temp_pos = instance.pos
 
-    while True:
-        fl1 = True
-        fr1 = True
-        bl1 = True
-        br1 = True
+    fl1 = True
+    fr1 = True
+    bl1 = True
+    br1 = True
 
-        if temp_pos % 10 == 8:
-            fl1 = False
-            fr1 = False
-        if temp_pos % 10 == 1:
-            bl1 = False
-            br1 = False
-        if temp_pos < 19:
-            fl1 = False
-            bl1 = False
-        if temp_pos > 80:
-            fr1 = False
-            br1 = False
+    if instance.pos % 10 == 8:
+        fl1 = False
+        fr1 = False
+    if instance.pos % 10 == 1:
+        bl1 = False
+        br1 = False
+    if instance.pos <= 21:
+        fl1 = False
+        bl1 = False
+    if instance.pos >= 81:
+        fr1 = False
+        br1 = False
 
+    if fr1:
+        temp_pos = instance.pos
+        found = False
+        while temp_pos % 10 < 8 and temp_pos <= 78 and not found:
+            for piece in pieces:
+                if piece.pos == temp_pos + 11:
+                    if piece.color == instance.color:
+                        found = True
+                    else:
+                        found = True
+                        moves.append([piece.pos, piece])
+            if not found:
+                temp_pos += 11
+                moves.append([temp_pos, None])
 
-        if not fl1 and not fr1 and not bl1 and not  br1:
-            break
+    if fl1:
+        temp_pos = instance.pos
+        found = False
+        while temp_pos % 10 < 8 and temp_pos > 20 and not found:
+            for piece in pieces:
+                if piece.pos == temp_pos - 9:
+                    if piece.color == instance.color:
+                        found = True
+                    else:
+                        found = True
+                        moves.append([piece.pos, piece])
+            if not found:
+                temp_pos -= 9
+                moves.append([temp_pos, None])
 
+    if bl1:
+        temp_pos = instance.pos
+        found = False
+        while temp_pos % 10 > 1 and temp_pos > 20 and not found:
+            for piece in pieces:
+                if piece.pos == temp_pos - 11:
+                    if piece.color == instance.color:
+                        found = True
+                    else:
+                        found = True
+                        moves.append([piece.pos, piece])
+            if not found:
+                temp_pos -= 11
+                moves.append([temp_pos, None])
 
+    if br1:
+        temp_pos = instance.pos
+        found = False
+        while temp_pos % 10 > 1 and temp_pos <= 78 and not found:
+            for piece in pieces:
+                if piece.pos == temp_pos + 9:
+                    if piece.color == instance.color:
+                        found = True
+                    else:
+                        found = True
+                        moves.append([piece.pos, piece])
+            if not found:
+
+                moves.append([temp_pos + 9, None])
+                temp_pos += 9
+
+    return moves
 
 
 def knight_move(instance):
@@ -210,9 +346,11 @@ def knight_move(instance):
 
 def draw_hints(instance):
     # Hint drawing for each possible move of selected piece. Also useful for creating logic.
-    if instance.moves is not None:
+    if instance.moves is not None and len(instance.moves) > 0:
         for move in instance.moves:
             window.blit(pygame.image.load(dot_img), (positions.get(move[0])[0], positions.get(move[0])[2]))
+    else:
+        print("I cant move :(")
 
 
 class Piece:
