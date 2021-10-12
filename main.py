@@ -43,6 +43,10 @@ dragging = False
 # Turn log for AI
 turn_log = ""
 
+# Current color 0 - white, 1 - black
+
+current_color = 0
+
 # Counter of dead pieces for correct rendering
 white_dead_pieces_counter = 0
 black_dead_pieces_counter = 0
@@ -163,7 +167,82 @@ def pawn_move(instance):
 
 
 def king_move(instance):
-    pass
+    moves = []
+    if instance.pos > 20:
+        found = False
+        for piece in pieces:
+            if piece.pos == instance.pos - 10:
+                found = True
+                if piece.color != instance.color:
+                    moves.append([piece.pos, piece])
+        if not found:
+            moves.append([instance.pos - 10, None])
+        if instance.pos % 10 > 1:
+            found = False
+            for piece in pieces:
+                if piece.pos == instance.pos - 11:
+                    found = True
+                    if piece.color != instance.color:
+                        moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos - 11, None])
+        if instance.pos % 10 < 8:
+            found = False
+            for piece in pieces:
+                if piece.pos == instance.pos - 9:
+                    found = True
+                    if piece.color != instance.color:
+                        moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos - 9, None])
+
+    if instance.pos < 70:
+        found = False
+        for piece in pieces:
+            if piece.pos == instance.pos + 10:
+                found = True
+                if piece.color != instance.color:
+                    moves.append([piece.pos, piece])
+        if not found:
+            moves.append([instance.pos + 10, None])
+        if instance.pos % 10 > 1:
+            found = False
+            for piece in pieces:
+                if piece.pos == instance.pos + 9:
+                    found = True
+                    if piece.color != instance.color:
+                        moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos + 9, None])
+        if instance.pos % 10 < 8:
+            found = False
+            for piece in pieces:
+                if piece.pos == instance.pos + 11:
+                    found = True
+                    if piece.color != instance.color:
+                        moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos + 11, None])
+    if instance.pos % 10 > 1:
+        for piece in pieces:
+            found = False
+            if piece.pos == instance.pos - 1:
+                found = True
+                if piece.color != instance.color:
+                    moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos - 1, None])
+    if instance.pos % 10 < 8:
+        for piece in pieces:
+            found = False
+            if piece.pos == instance.pos + 1:
+                found = True
+                if piece.color != instance.color:
+                    moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos + 1, None])
+
+    return moves
 
 
 def queen_move(instance):
@@ -341,12 +420,94 @@ def bishop_move(instance):
 
 
 def knight_move(instance):
-    pass
+    moves = []
+    if instance.pos % 10 <= 6:
+        if instance.pos < 80:
+            found = False
+            for piece in pieces:
+                if piece.pos == instance.pos + 12:
+                    found = True
+                    if piece.color != instance.color:
+                        moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos + 12, None])
+        if instance.pos > 20:
+            found = False
+            for piece in pieces:
+                if piece.pos == instance.pos - 8:
+                    found = True
+                    if piece.color != instance.color:
+                        moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos - 8, None])
+
+    if instance.pos % 10 >= 3:
+        if instance.pos < 80:
+            found = False
+            for piece in pieces:
+                if piece.pos == instance.pos + 8:
+                    found = True
+                    if piece.color != instance.color:
+                        moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos + 8, None])
+        if instance.pos > 20:
+            found = False
+            for piece in pieces:
+                if piece.pos == instance.pos - 12:
+                    found = True
+                    if piece.color != instance.color:
+                        moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos - 12, None])
+
+    if instance.pos > 30:
+        if instance.pos % 10 > 1:
+            found = False
+            for piece in pieces:
+                if piece.pos == instance.pos - 21:
+                    found = True
+                    if piece.color != instance.color:
+                        moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos - 21, None])
+        if instance.pos % 10 < 8:
+            found = False
+            for piece in pieces:
+                if piece.pos == instance.pos - 19:
+                    found = True
+                    if piece.color != instance.color:
+                        moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos - 19, None])
+
+    if instance.pos < 70:
+        if instance.pos % 10 < 8:
+            found = False
+            for piece in pieces:
+                if piece.pos == instance.pos + 21:
+                    found = True
+                    if piece.color != instance.color:
+                        moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos + 21, None])
+        if instance.pos % 10 > 1:
+            found = False
+            for piece in pieces:
+                if piece.pos == instance.pos + 19:
+                    found = True
+                    if piece.color != instance.color:
+                        moves.append([piece.pos, piece])
+            if not found:
+                moves.append([instance.pos + 19, None])
+
+    return moves
 
 
 def draw_hints(instance):
     # Hint drawing for each possible move of selected piece. Also useful for creating logic.
     if instance.moves is not None and len(instance.moves) > 0:
+
         for move in instance.moves:
             window.blit(pygame.image.load(dot_img), (positions.get(move[0])[0], positions.get(move[0])[2]))
     else:
@@ -410,18 +571,26 @@ class Piece:
         """
         global selected_piece
         global turn
+        global current_color
+        print(current_color)
         moved = False
         for move in self.moves:
-            if pos == move[0]:
-                moved = True
-                if move[1] is not None:
-                    move[1].die()
-                self.pos = pos
-                selected_piece = None
-                self.last_turn = turn
-                turn += 1
-                for piece in pieces:
-                    piece.what_can_i_do()
+
+            if self.color == "w" and current_color == 0 or self.color == "b" and current_color == 1:
+                if pos == move[0]:
+                    moved = True
+                    if current_color == 0:
+                        current_color = 1
+                    else:
+                        current_color = 0
+                    if move[1] is not None:
+                        move[1].die()
+                    self.pos = pos
+                    selected_piece = None
+                    self.last_turn = turn
+                    turn += 1
+                    for piece in pieces:
+                        piece.what_can_i_do()
 
         # Pawn to Queen
         if self.name == "P":
@@ -458,22 +627,12 @@ class Piece:
         return positions.get(self.pos)[0], positions.get(self.pos)[2]
 
 
-# game init and window options
-pygame.init()
-window = pygame.display.set_mode((1800, 1000))
-window.fill((211, 211, 211))
-pygame.display.set_caption("CHESS")
-
-
 def create_figure_instances(start_pos):
     for pos in start_pos:
         pieces.append(Piece(pos[0], pos[1], pos[2:4]))
 
     for piece in pieces:
         piece.what_can_i_do()
-
-
-create_figure_instances(start_positions)
 
 
 def draw_board():
@@ -526,6 +685,12 @@ def draw_figures():
     for piece in pieces:
         window.blit(pygame.image.load(piece.img), (piece.get_pos_coord()))
 
+# game init and window options
+pygame.init()
+window = pygame.display.set_mode((1800, 1000))
+window.fill((211, 211, 211))
+pygame.display.set_caption("CHESS")
+create_figure_instances(start_positions)
 
 while run:
     # Delay for reducing the CPU load
@@ -557,3 +722,4 @@ while run:
 print("See you next time!")
 # Quitting the app
 pygame.quit()
+quit()
