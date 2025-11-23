@@ -1,5 +1,3 @@
-import logging
-
 import pygame
 
 
@@ -24,16 +22,20 @@ class Game:
 
     def _draw_board(self):
         """
-            Draws board contents
+        Draws board contents
         """
-        
+
         pass
 
     def _draw(self):
         # draw board background
         for i in range(1, 9):
             for z in range(1, 9):
-                tile_color = pygame.Color(255, 255, 255) if (i + z) % 2 == 0 else pygame.Color(50, 50, 50)
+                tile_color = (
+                    pygame.Color(255, 255, 255)
+                    if (i + z) % 2 == 0
+                    else pygame.Color(50, 50, 50)
+                )
 
                 pygame.draw.rect(
                     self.surface,
@@ -56,13 +58,13 @@ class Game:
                 if event.type == pygame.QUIT:
                     self._is_running = False
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1: # LMB
+                    if event.button == 1:  # LMB
                         pass
-                    elif event.button == 3: # RMB
+                    elif event.button == 3:  # RMB
                         pass
 
             self._draw()
 
-            pygame.display.update() # TODO: add freeze logic on no changes
+            pygame.display.update()  # TODO: add freeze logic on no changes
 
         pygame.quit()
