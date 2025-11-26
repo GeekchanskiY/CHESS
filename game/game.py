@@ -1,5 +1,6 @@
 import pygame
 
+from .board import Board
 
 class Game:
     """
@@ -13,12 +14,18 @@ class Game:
         self._is_running = True
         self._cell_size = 80
 
+        # Pygame config
         pygame.init()
         pygame.display.set_caption("CHESS")
         pygame.display.set_mode((self._cell_size * 10, self._cell_size * 10))
 
         self.surface = pygame.display.get_surface()
         self.surface.fill((211, 211, 211))
+
+        # Board config
+        self.board = Board()
+
+
 
     def _draw_board(self):
         """
