@@ -1,5 +1,7 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
 
+IMG_FOLDER = 'images/berlin/'
 
 class Piece(ABC):
     @abstractmethod
@@ -11,7 +13,11 @@ class Piece(ABC):
         pass
 
     @abstractmethod
-    def get_pos(self) -> tuple[int, int]:
+    def get_pos(self) -> int:
+        pass
+
+    @abstractmethod
+    def get_available_moves(self, other_pieces: list[Piece]) -> list[int]:
         pass
 
     @abstractmethod
