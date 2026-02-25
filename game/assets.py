@@ -12,6 +12,9 @@ class Asset:
         self.piece_assets_folder = piece_assets_folder
 
     def get_piece_image(self, piece: Piece):
+        c = piece.get_color()
+        name = piece.get_name()
+
         pass
 
 

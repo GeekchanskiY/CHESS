@@ -1,6 +1,6 @@
-from __future__ import annotations
 from abc import ABC, abstractmethod
 from .color import Color
+from .move import Move
 
 
 class Piece(ABC):
@@ -13,11 +13,7 @@ class Piece(ABC):
         pass
 
     @abstractmethod
-    def get_moves(self):
-        pass
-
-    @abstractmethod
-    def move(self, pos):
+    def move(self, pos: int, turn: int) -> Move:
         pass
 
     @abstractmethod
@@ -25,9 +21,13 @@ class Piece(ABC):
         pass
 
     @abstractmethod
-    def get_available_moves(self, other_pieces: list[Piece]) -> list[int]:
+    def get_moves(self) -> list[Move]:
         pass
 
     @abstractmethod
-    def get_image_path(self) -> str:
+    def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[int]:
+        pass
+
+    @abstractmethod
+    def get_color(self):
         pass

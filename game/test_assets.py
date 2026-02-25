@@ -1,9 +1,9 @@
-import assets
+from .assets import Assets
 
 
 def test_assets_list_available_aseets():
     "test checks that assets display correct available themes"
-    asset = assets.Assets()
+    asset = Assets()
 
     themes = asset.available_themes()
 

@@ -7,4 +7,4 @@ format:
 	ruff format .
 
 test:
-	pytest
+	pytest -v .
