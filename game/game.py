@@ -37,11 +37,7 @@ class Game:
         # draw board background
         for i in range(1, 9):
             for z in range(1, 9):
-                tile_color = (
-                    pygame.Color(255, 255, 255)
-                    if (i + z) % 2 == 0
-                    else pygame.Color(50, 50, 50)
-                )
+                tile_color = pygame.Color(255, 255, 255) if (i + z) % 2 == 0 else pygame.Color(50, 50, 50)
 
                 pygame.draw.rect(
                     self.surface,

@@ -8,7 +8,7 @@ class Pawn(Piece):
     def __init__(self, pos: int, color: Color):
         if type(color) is not Color:
             raise InvalidColorException()
-        
+
         self.pos = pos
         self.moves: list[Move] = []
         self.color = color
@@ -18,6 +18,9 @@ class Pawn(Piece):
         if pos not in self.get_available_moves(other_pieces):
             raise InvalidMoveException()
         pass
+
+    def get_moves(self) -> list[Move]:
+        return []
 
     def get_available_moves(self, other_pieces: list[Piece]) -> list[int]:
         moves = []
@@ -57,21 +60,13 @@ class Pawn(Piece):
 
             # En passant rule
             if piece.pos == self.pos + 10:
-                if (
-                    piece.name == "P"
-                    and piece.last_turn == turn - 1
-                    and piece.color != instance.color
-                ):
+                if piece.name == "P" and piece.last_turn == turn - 1 and piece.color != instance.color:
                     if self.color == "w":
                         moves.append([self.pos + 11, piece])
                     else:
                         moves.append([self.pos + 9, piece])
             if piece.pos == self.pos - 10:
-                if (
-                    piece.name == "P"
-                    and piece.last_turn == turn - 1
-                    and piece.color != self.color
-                ):
+                if piece.name == "P" and piece.last_turn == turn - 1 and piece.color != self.color:
                     if self.color == "w":
                         moves.append([self.pos - 9, piece])
                     else:

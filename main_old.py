@@ -162,21 +162,13 @@ def pawn_move(instance):
 
         # En passant rule
         if piece.pos == instance.pos + 10:
-            if (
-                piece.name == "P"
-                and piece.last_turn == turn - 1
-                and piece.color != instance.color
-            ):
+            if piece.name == "P" and piece.last_turn == turn - 1 and piece.color != instance.color:
                 if instance.color == "w":
                     moves.append([instance.pos + 11, piece])
                 else:
                     moves.append([instance.pos + 9, piece])
         if piece.pos == instance.pos - 10:
-            if (
-                piece.name == "P"
-                and piece.last_turn == turn - 1
-                and piece.color != instance.color
-            ):
+            if piece.name == "P" and piece.last_turn == turn - 1 and piece.color != instance.color:
                 if instance.color == "w":
                     moves.append([instance.pos - 9, piece])
                 else:
@@ -606,12 +598,7 @@ class Piece:
         print(current_color)
         moved = False
         for move in self.moves:
-            if (
-                self.color == "w"
-                and current_color == 0
-                or self.color == "b"
-                and current_color == 1
-            ):
+            if self.color == "w" and current_color == 0 or self.color == "b" and current_color == 1:
                 if pos == move[0]:
                     moved = True
                     if current_color == 0:
@@ -675,9 +662,7 @@ def draw_board():
     for i in range(1, 9):
         for z in range(1, 9):
             if cnt % 2 == 0:
-                pygame.draw.rect(
-                    window, pygame.Color(50, 50, 50), (size * z, size * i, size, size)
-                )
+                pygame.draw.rect(window, pygame.Color(50, 50, 50), (size * z, size * i, size, size))
             else:
                 pygame.draw.rect(
                     window,
