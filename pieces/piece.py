@@ -1,10 +1,17 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-
-IMG_FOLDER = "images/berlin/"
+from .color import Color
 
 
 class Piece(ABC):
+    @abstractmethod
+    def get_color(self) -> Color:
+        pass
+
+    @abstractmethod
+    def get_name(self) -> str:
+        pass
+
     @abstractmethod
     def get_moves(self):
         pass
