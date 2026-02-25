@@ -1,7 +1,8 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
-IMG_FOLDER = 'images/berlin/'
+IMG_FOLDER = "images/berlin/"
+
 
 class Piece(ABC):
     @abstractmethod

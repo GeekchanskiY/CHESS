@@ -114,8 +114,8 @@ for z in range(1, 9):
         ]
 
 # Image folders
-img_folder = os.path.abspath("images/berlin/")
-dot_img = os.path.abspath("images/dot.png")
+img_folder = os.path.abspath("assets/berlin/")
+dot_img = os.path.abspath("assets/dot.png")
 
 
 # Movement functions. It takes an instance and returns a list of lists with 2 elements.

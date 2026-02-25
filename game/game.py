@@ -2,6 +2,7 @@ import pygame
 
 from .board import Board
 
+
 class Game:
     """
     Game is a view class which renders window using pygame, and
@@ -24,8 +25,6 @@ class Game:
 
         # Board config
         self.board = Board()
-
-
 
     def _draw_board(self):
         """

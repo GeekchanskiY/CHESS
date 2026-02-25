@@ -9,9 +9,9 @@ class Pawn(Piece):
 
         if type(color) is not Color:
             raise InvalidColor
-        
+
         self.color = color
-        self.name = 'Pawn'
+        self.name = "Pawn"
 
     def move(self, pos):
         pass
