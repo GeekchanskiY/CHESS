@@ -16,6 +16,7 @@ Positions matrix:
 """
 
 from typing import List
+from pieces.factory import piece_factory
 from pieces.piece import Piece
 from pieces.color import Color
 
@@ -69,4 +70,7 @@ class Board:
         self.turn = 0
 
         for pos in START_POSITIONS:
-            self.pieces.append(Piece(Color(pos[0]), pos[1], pos[2:4]))
+            try:
+                self.pieces.append(piece_factory(Color(pos[0]), pos[1], pos[2:4]))
+            except ValueError:
+                print(f"Warning: piece {pos} is not implemented yet")

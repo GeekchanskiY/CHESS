@@ -25,7 +25,7 @@ class Piece(ABC):
         pass
 
     @abstractmethod
-    def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[int]:
+    def get_available_moves(self, other_pieces: list["Piece"], turn: int) -> list[int]:
         pass
 
     @abstractmethod

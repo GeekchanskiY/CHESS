@@ -15,7 +15,7 @@ class Asset:
         c = piece.get_color()
         name = piece.get_name()
 
-        pass
+        return self.piece_assets_folder + "/{}.png".format(c + name)
 
 
 class Assets:
