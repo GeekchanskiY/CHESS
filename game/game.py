@@ -1,6 +1,7 @@
 import pygame
 
 from .board import Board
+from .assets import Assets
 
 
 class Game:
@@ -26,15 +27,17 @@ class Game:
         # Board config
         self.board = Board()
 
+        self.assets = Assets().load("pixel")
+
         # visualisation utils
         self.positions = {}
         for z in range(1, 9):
             for i in range(1, 9):
                 self.positions[int(str(z) + str(9 - i))] = [
-                    self._cell_size * z,
-                    self._cell_size * (z + 1),
                     self._cell_size * i,
                     self._cell_size * (i + 1),
+                    self._cell_size * z,
+                    self._cell_size * (z + 1),
                 ]
 
     def _draw_board(self):
@@ -43,10 +46,10 @@ class Game:
         """
 
         for piece in self.board.pieces:
-            self.surface.blit(pygame.image.load(piece.img), (self._get_pos(piece.get_pos())))
+            self.surface.blit(pygame.image.load(self.assets.get_piece_image(piece)), (self._get_pos(piece.get_pos())))
 
     def _get_pos(self, pos: int) -> set[int, int]:
-        return (self.positions.get(pos)[0], self.positions.get(pos)[2])
+        return (self.positions.get(int(pos))[0], self.positions.get(int(pos))[2])
 
     def _draw(self):
         # draw board background

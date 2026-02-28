@@ -12,7 +12,7 @@ class Pawn(Piece):
         self.pos = pos
         self.moves: list[Move] = []
         self.color = color
-        self.name = "Pawn"
+        self.name = "P"
 
     def move(self, pos: int, other_pieces: list[Piece]):
         if pos not in self.get_available_moves(other_pieces):
