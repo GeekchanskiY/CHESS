@@ -14,6 +14,8 @@ class Pawn(Piece):
         self.color = color
         self.name = "P"
 
+        self.VALUE = 1
+
     def move(self, pos: int, other_pieces: list[Piece]):
         if pos not in self.get_available_moves(other_pieces):
             raise InvalidMoveException()

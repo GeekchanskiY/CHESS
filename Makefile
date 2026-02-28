@@ -1,4 +1,4 @@
-.PHONY: lint format test
+.PHONY: lint format test run
 
 lint:
 	ruff check . --fix
@@ -8,3 +8,6 @@ format:
 
 test:
 	pytest -v .
+
+run:
+	python main.py

@@ -5,7 +5,7 @@ def test_assets_list_available_aseets():
     "test checks that assets display correct available themes"
     asset = Assets()
 
-    themes = asset.available_themes()
+    themes = asset._available_themes()
 
     real_themes = [
         "kosal",
