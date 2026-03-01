@@ -70,6 +70,14 @@ class Game:
 
         self._draw_board()
 
+    def _mouse_pos(self): # TODO: optimize
+        mouse_position = pygame.mouse.get_pos()
+        for p in self.positions:
+            cell = self.positions.get(p)
+            if int(cell[0]) < mouse_position[1] < int(cell[1]):
+                if int(cell[2]) < mouse_position[0] < int(cell[3]):
+                    return p
+
     def run(self):
         while self._is_running:
             pygame.time.delay(100)
@@ -79,7 +87,7 @@ class Game:
                     self._is_running = False
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # LMB
-                        pass
+                        print(self._mouse_pos())
                     elif event.button == 3:  # RMB
                         pass
 
