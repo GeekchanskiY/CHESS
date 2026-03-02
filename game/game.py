@@ -3,6 +3,26 @@ import pygame
 from .board import Board
 from .assets import Assets
 
+class Tile:
+    def __init__(self, pos: int, width: int, offset_x: int, offset_y: int, color: pygame.Color):
+        self.pos = pos
+        
+        self.pos_x = offset_x + width * (pos % 10)
+        self.pos_y = offset_y + width * (pos // 10)
+
+        self.width = width
+        self.offset_x = offset_x
+        self.offset_y = offset_y
+        self.color = color
+    
+    def get_rect(self) -> set[int, int, int, int]:
+        return (self.pos_x, self.pos_y, self.width, self.width)
+    
+    def get_color(self):
+        return self.color
+    
+    def pos_matches(self, pos: int) -> bool:
+        return self.pos == pos
 
 class Game:
     """
@@ -24,6 +44,7 @@ class Game:
         self.surface = pygame.display.get_surface()
         self.surface.fill((211, 211, 211))
 
+
         # Board config
         self.board = Board()
 
@@ -31,8 +52,10 @@ class Game:
 
         # visualisation utils
         self.positions = {}
+        self.tiles = []
         for z in range(1, 9):
             for i in range(1, 9):
+                self.tiles.append(Tile(int(str(i) + str(9 - z)), self._cell_size, 0, 0, pygame.Color(255, 255, 255) if (i + z) % 2 == 0 else pygame.Color(50, 50, 50)))
                 self.positions[int(str(z) + str(9 - i))] = [
                     self._cell_size * i,
                     self._cell_size * (i + 1),
@@ -53,19 +76,11 @@ class Game:
 
     def _draw(self):
         # draw board background
-        for i in range(1, 9):
-            for z in range(1, 9):
-                tile_color = pygame.Color(255, 255, 255) if (i + z) % 2 == 0 else pygame.Color(50, 50, 50)
-
+        for i in self.tiles:
                 pygame.draw.rect(
                     self.surface,
-                    tile_color,
-                    (
-                        self._cell_size * z,
-                        self._cell_size * i,
-                        self._cell_size,
-                        self._cell_size,
-                    ),
+                    i.get_color(),
+                    i.get_rect(),
                 )
 
         self._draw_board()
