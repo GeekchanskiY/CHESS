@@ -55,7 +55,7 @@ class Game:
         self.tiles = []
         for z in range(1, 9):
             for i in range(1, 9):
-                self.tiles.append(Tile(int(str(i) + str(9 - z)), self._cell_size, 0, 0, pygame.Color(255, 255, 255) if (i + z) % 2 == 0 else pygame.Color(50, 50, 50)))
+                self.tiles.append(Tile(int(str(i) + str(9 - z)), self._cell_size, 0, 0, pygame.Color(50, 50, 50) if (i + z) % 2 == 0 else pygame.Color(205, 205, 205)))
                 self.positions[int(str(z) + str(9 - i))] = [
                     self._cell_size * i,
                     self._cell_size * (i + 1),
