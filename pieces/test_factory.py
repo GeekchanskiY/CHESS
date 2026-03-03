@@ -12,12 +12,14 @@ def test_factory_pawn():
     assert piece.pos == 12
     assert piece.color.color == Color("b").color
 
+
 def test_factory_rook():
     piece = piece_factory(Color("w"), "R", 12)
 
     assert piece.name == "R"
     assert piece.pos == 12
     assert piece.color.color == Color("w").color
+
 
 def test_factory_knight():
     piece = piece_factory(Color("b"), "N", 12)
@@ -26,12 +28,14 @@ def test_factory_knight():
     assert piece.pos == 12
     assert piece.color.color == Color("b").color
 
+
 def test_factory_bishop():
     piece = piece_factory(Color("w"), "B", 12)
 
     assert piece.name == "B"
     assert piece.pos == 12
     assert piece.color.color == Color("w").color
+
 
 def test_factory_queen():
     piece = piece_factory(Color("b"), "Q", 12)
@@ -40,12 +44,14 @@ def test_factory_queen():
     assert piece.pos == 12
     assert piece.color.color == Color("b").color
 
+
 def test_factory_king():
     piece = piece_factory(Color("w"), "K", 12)
 
     assert piece.name == "K"
     assert piece.pos == 12
     assert piece.color.color == Color("w").color
+
 
 def test_factory_wrong_piece():
     try:

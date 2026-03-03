@@ -13,7 +13,7 @@ class Bishop(Piece):
         self.moves: list[Move] = []
         self.color = color
         self.name = "B"
-        
+
         self.VALUE = 3
 
     def move(self, pos: int, other_pieces: list[Piece]):

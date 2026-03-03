@@ -11,7 +11,7 @@ from .piece import Piece
 def piece_factory(color: Color, piece_name: str, pos: int) -> Piece:
     if type(color) is not Color:
         raise ValueError("color must be of type Color")
-    
+
     match piece_name:
         case "P":
             return Pawn(pos, color)

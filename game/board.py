@@ -12,6 +12,8 @@ Positions matrix:
 2 [71, 72, 73, 74, 75, 76, 77, 78] 2
 1 [81, 82, 83, 84, 85, 86, 87, 88] 1
    A   B   C   D   E   F   G   H
+
+Positions start from top-left corner due to pygame coordinate system.
 """
 
 from typing import List
@@ -61,6 +63,7 @@ START_POSITIONS = [
 
 class Board:
     """Board is a main object containing info about the game"""
+
     field_names_x = {"A": 1, "B": 2, "C": 3, "D": 4, "E": 5, "F": 6, "G": 7, "H": 8}
     field_names_x_rev = {value: key for key, value in field_names_x.items()}
 
@@ -70,6 +73,6 @@ class Board:
 
         for pos in START_POSITIONS:
             try:
-                self.pieces.append(piece_factory(Color(pos[0]), pos[1], pos[2:4]))
+                self.pieces.append(piece_factory(Color(pos[0]), pos[1], int(pos[2:4])))
             except ValueError:
                 print(f"Warning: piece {pos} is not implemented yet")
