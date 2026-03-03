@@ -24,7 +24,6 @@ class Tile:
         return self.color
 
     def pos_matches(self, pos: int) -> bool:
-        print(type(pos), type(self.pos))
         return self.pos == pos
 
     def get_piece_coords(self) -> set[int]:
@@ -128,9 +127,9 @@ class Game:
                     self._is_running = False
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # LMB
-                        print(self._mouse_pos())
+                        print("LMB", self._mouse_pos())
                     elif event.button == 3:  # RMB
-                        pass
+                        print("RMB", self._mouse_pos())
 
             self._draw()
 
