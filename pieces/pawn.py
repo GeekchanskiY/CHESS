@@ -25,7 +25,7 @@ class Pawn(Piece):
         return []
 
     def get_available_moves(self, other_pieces: list[Piece]) -> list[int]:
-        moves = []
+        moves = [self.pos + 10] if self.color == BLACK else [self.pos - 10]
 
         return moves
 

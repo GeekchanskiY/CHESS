@@ -16,6 +16,9 @@ class Asset:
         name = piece.get_name()
 
         return self.piece_assets_folder + "/{}.png".format(color() + name)
+    
+    def get_hint_image(self):
+        return os.path.join(self.piece_assets_folder, "..", "dot.png")
 
 
 class Assets:

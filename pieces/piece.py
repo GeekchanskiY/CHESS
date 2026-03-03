@@ -27,7 +27,3 @@ class Piece(ABC):
     @abstractmethod
     def get_available_moves(self, other_pieces: list["Piece"], turn: int) -> list[int]:
         pass
-
-    @abstractmethod
-    def get_color(self):
-        pass

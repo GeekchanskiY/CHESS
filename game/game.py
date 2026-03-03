@@ -2,42 +2,12 @@ from itertools import product
 import pygame
 from typing import Dict
 
-from .board import Board
+from board.board import Board
+from .tile import Tile
 from .assets import Assets
+from pieces.piece import Piece
 
-
-class Tile:
-    """
-    Tile is a class which represents one cell on the board, and contains info about its position on screen and color
-    """
-
-    def __init__(self, pos: int, width: int, offset_x: int, offset_y: int, color: pygame.Color):
-        self.pos = pos
-
-        self.pos_x = offset_x + width * (pos % 10 - 1)
-        self.pos_y = offset_y + width * (pos // 10 - 1)
-
-        self.width = width
-        self.offset_x = offset_x
-        self.offset_y = offset_y
-        self.color = color
-
-    def get_rect(self) -> pygame.Rect:
-        """Returns coordinates of tile in pixels"""
-        return pygame.Rect(self.pos_x, self.pos_y, self.width, self.width)
-
-    def get_color(self):
-        """Returns color of tile"""
-        return self.color
-
-    def pos_matches(self, pos: int) -> bool:
-        """Returns true if tile position matches given position"""
-        return self.pos == pos
-
-    def get_piece_coords(self) -> pygame.Rect:
-        """Gets coordinates of piece on tile in pixels"""
-        return pygame.Rect(self.pos_x, self.pos_y, self.width, self.width)
-
+from logging import debug
 
 class Game:
     """
@@ -79,17 +49,29 @@ class Game:
             )
 
             self.tiles.append(new_tile)
-            self.tiles_dict[int(str(i) + str(9 - z))] = new_tile
+            self.tiles_dict[i * 10 + z] = new_tile
+        
+        # Game state
+        self.selected_piece = None
+        self.available_moves = []
 
     def _draw_pieces(self):
         """Draws board pieces"""
 
+        # TODO: pre-load images for better performance
         for piece in self.board.pieces:
             self.surface.blit(pygame.image.load(self.assets.get_piece_image(piece)), self._get_pos(piece.get_pos()))
 
-    def _get_pos(self, pos: int) -> set[int]:
+    def _draw_hints(self):
+        """Draws hints for selected piece"""
+
+        for move in self.available_moves:
+            self.surface.blit(pygame.image.load(self.assets.get_hint_image()), self._get_pos(move))
+
+    def _get_pos(self, pos: int) -> pygame.Rect:
         """Get position of tile in pixels"""
-        return self.tiles_dict[pos].get_piece_coords()
+        tile: Tile = self.tiles_dict[pos] 
+        return tile.get_piece_coords()
 
     def _draw(self):
         """Draws tiles and pieces"""
@@ -101,6 +83,7 @@ class Game:
             )
 
         self._draw_pieces()
+        self._draw_hints()
 
     def _mouse_pos(self) -> int:
         """Returns tile number from current mouse coordinates"""
@@ -126,6 +109,21 @@ class Game:
                 return piece
 
         return None
+    
+    def _clear_cursor(self):
+        """Clears cursor state"""
+        self.selected_piece = None
+        self.available_moves = []
+        debug("Cursor cleared")
+
+    def _select_piece(self, pos: int):
+        """Selects piece and shows available moves"""
+        piece: Piece = self._get_piece_on_tile(pos)
+
+        self.selected_piece = piece
+        self.available_moves = piece.get_available_moves(self.board.pieces)
+
+        debug(f"Selected piece {piece.get_name()} at {piece.get_pos()}, available moves: {self.available_moves}")
 
     def run(self):
         """Game loop, which handles user input and renders window"""
@@ -137,11 +135,13 @@ class Game:
                     self._is_running = False
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # LMB
-                        print("LMB", self._mouse_pos())
+                        debug(f"LMB {self._mouse_pos()}")
                         piece = self._get_piece_on_tile(self._mouse_pos())
-                        print(piece.get_name() if piece else "no piece")
+                        if piece:
+                            self._select_piece(self._mouse_pos())
                     elif event.button == 3:  # RMB
-                        print("RMB", self._mouse_pos())
+                        debug(f"RMB {self._mouse_pos()}")
+                        self._clear_cursor()
 
             self._draw()
 
