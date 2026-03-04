@@ -17,6 +17,7 @@ Positions start from top-left corner due to pygame coordinate system.
 """
 
 from typing import List
+from .exceptions import InvalidPieceException, InvalidMoveException
 from pieces.factory import piece_factory
 from pieces.piece import Piece
 from pieces.color import Color
@@ -76,3 +77,14 @@ class Board:
                 self.pieces.append(piece_factory(Color(pos[0]), pos[1], int(pos[2:4])))
             except ValueError:
                 print(f"Warning: piece {pos} is not implemented yet")
+
+    def make_turn(self, piece: Piece, pos: int):
+        if piece not in self.pieces:
+            raise InvalidPieceException()
+
+        if pos not in piece.get_available_moves(self.pieces, self.turn):
+            raise InvalidMoveException()
+
+        piece.move(pos, self.pieces, self.turn)
+
+        self.turn += 1

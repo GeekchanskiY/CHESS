@@ -16,15 +16,17 @@ class Pawn(Piece):
 
         self.VALUE: int = 1
 
-    def move(self, pos: int, other_pieces: list[Piece]):
-        if pos not in self.get_available_moves(other_pieces):
+    def move(self, pos: int, other_pieces: list[Piece], turn: int):
+        if pos not in self.get_available_moves(other_pieces, turn):
             raise InvalidMoveException()
-        pass
+
+        self.pos = pos
+        # TODO: add move creation
 
     def get_moves(self) -> list[Move]:
         return []
 
-    def get_available_moves(self, other_pieces: list[Piece]) -> list[int]:
+    def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[int]:
         moves = [self.pos + 10] if self.color == BLACK else [self.pos - 10]
 
         return moves

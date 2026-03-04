@@ -9,13 +9,12 @@ from pieces.piece import Piece
 
 from logging import debug
 
+
 class Game:
     """
     Game is a view class which renders window using pygame, and
     matches user input with board actions
     """
-
-    modes = {}
 
     def __init__(self):
         self._is_running: bool = True
@@ -50,10 +49,12 @@ class Game:
 
             self.tiles.append(new_tile)
             self.tiles_dict[i * 10 + z] = new_tile
-        
+
         # Game state
         self.selected_piece = None
         self.available_moves = []
+
+    # DRAW METHODS (TODO: move to separate class)
 
     def _draw_pieces(self):
         """Draws board pieces"""
@@ -68,13 +69,10 @@ class Game:
         for move in self.available_moves:
             self.surface.blit(pygame.image.load(self.assets.get_hint_image()), self._get_pos(move))
 
-    def _get_pos(self, pos: int) -> pygame.Rect:
-        """Get position of tile in pixels"""
-        tile: Tile = self.tiles_dict[pos] 
-        return tile.get_piece_coords()
-
     def _draw(self):
         """Draws tiles and pieces"""
+        debug("drawing scene")
+
         for i in self.tiles:
             pygame.draw.rect(
                 self.surface,
@@ -84,6 +82,14 @@ class Game:
 
         self._draw_pieces()
         self._draw_hints()
+
+        pygame.display.update()
+
+    # Click handling metgods
+    def _get_pos(self, pos: int) -> pygame.Rect:
+        """Get position of tile in pixels"""
+        tile: Tile = self.tiles_dict[pos]
+        return tile.get_piece_coords()
 
     def _mouse_pos(self) -> int:
         """Returns tile number from current mouse coordinates"""
@@ -109,7 +115,7 @@ class Game:
                 return piece
 
         return None
-    
+
     def _clear_cursor(self):
         """Clears cursor state"""
         self.selected_piece = None
@@ -121,12 +127,45 @@ class Game:
         piece: Piece = self._get_piece_on_tile(pos)
 
         self.selected_piece = piece
-        self.available_moves = piece.get_available_moves(self.board.pieces)
+        self.available_moves = piece.get_available_moves(self.board.pieces, self.board.turn)
 
         debug(f"Selected piece {piece.get_name()} at {piece.get_pos()}, available moves: {self.available_moves}")
 
+    def _lmb_click(self):
+        debug(f"LMB {self._mouse_pos()}")
+
+        should_redraw = False
+
+        pos = self._mouse_pos()
+        if self.selected_piece != None:
+            if pos in self.available_moves:
+                self.board.make_turn(self.selected_piece, pos)
+
+        piece = self._get_piece_on_tile(pos)
+        if piece:
+            self._select_piece(self._mouse_pos())
+            should_redraw = True
+
+        if should_redraw:
+            self._draw()
+
+    def _rmb_click(self):
+        debug(f"RMB {self._mouse_pos()}")
+
+        should_redraw = False
+
+        if self.selected_piece is not None:
+            self._clear_cursor()
+            should_redraw = True
+
+        if should_redraw:
+            self._draw()
+
     def run(self):
         """Game loop, which handles user input and renders window"""
+
+        self._draw()
+
         while self._is_running:
             pygame.time.delay(100)
 
@@ -135,16 +174,10 @@ class Game:
                     self._is_running = False
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # LMB
-                        debug(f"LMB {self._mouse_pos()}")
-                        piece = self._get_piece_on_tile(self._mouse_pos())
-                        if piece:
-                            self._select_piece(self._mouse_pos())
+                        self._lmb_click()
                     elif event.button == 3:  # RMB
-                        debug(f"RMB {self._mouse_pos()}")
-                        self._clear_cursor()
+                        self._rmb_click()
 
-            self._draw()
-
-            pygame.display.update()  # TODO: add freeze logic on no changes
+            pygame.display.update()
 
         pygame.quit()

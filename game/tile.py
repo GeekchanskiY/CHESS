@@ -1,5 +1,6 @@
 from pygame import Rect, Color
 
+
 class Tile:
     """
     Tile is a class which represents one cell on the board, and contains info about its position on screen and color
