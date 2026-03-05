@@ -6,6 +6,7 @@ from board.board import Board
 from .tile import Tile
 from .assets import Assets
 from pieces.piece import Piece
+from pieces.color import BLACK, WHITE
 
 from logging import debug
 
@@ -134,31 +135,28 @@ class Game:
     def _lmb_click(self):
         debug(f"LMB {self._mouse_pos()}")
 
-        should_redraw = False
-
         pos = self._mouse_pos()
         if self.selected_piece != None:
             if pos in self.available_moves:
                 self.board.make_turn(self.selected_piece, pos)
+                self._clear_cursor()
+                self._draw()
+
+                return
 
         piece = self._get_piece_on_tile(pos)
         if piece:
-            self._select_piece(self._mouse_pos())
-            should_redraw = True
+            if self.board.turn % 2 == 0 and piece.get_color() == WHITE or self.board.turn % 2 == 1 and piece.get_color() == BLACK:
+                self._select_piece(self._mouse_pos())
+                self._draw()
 
-        if should_redraw:
-            self._draw()
+                return
 
     def _rmb_click(self):
         debug(f"RMB {self._mouse_pos()}")
 
-        should_redraw = False
-
         if self.selected_piece is not None:
             self._clear_cursor()
-            should_redraw = True
-
-        if should_redraw:
             self._draw()
 
     def run(self):
