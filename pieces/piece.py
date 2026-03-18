@@ -1,28 +1,29 @@
 from abc import ABC, abstractmethod
 from .color import Color
 from .move import Move
+from .exceptions import InvalidMoveException, InvalidColorException
 
 
 class Piece(ABC):
-    @abstractmethod
     def get_color(self) -> Color:
-        pass
+        return self.color
 
-    @abstractmethod
     def get_name(self) -> str:
-        pass
+        return self.name
 
-    @abstractmethod
-    def move(self, pos: int, turn: int) -> Move:
-        pass
+    def move(self, move: Move, other_pieces: list["Piece"], turn: int) -> Move:
+        if move not in self.get_available_moves(other_pieces, turn):
+            raise InvalidMoveException("Provided move is illegal!")
 
-    @abstractmethod
+        self.moves.append(move)
+
+        self.pos = move.new_pos
+
     def get_pos(self) -> int:
-        pass
+        return self.pos
 
-    @abstractmethod
     def get_moves(self) -> list[Move]:
-        pass
+        return self.moves
 
     @abstractmethod
     def get_available_moves(self, other_pieces: list["Piece"], turn: int) -> list[int]:

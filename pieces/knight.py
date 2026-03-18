@@ -20,19 +20,19 @@ class Knight(Piece):
 
         self.VALUE = 3
 
-    def move(self, pos: int, other_pieces: list[Piece], turn: int):
-        if pos not in self.get_available_moves(other_pieces, turn):
+    def move(self, move: Move, other_pieces: list[Piece], turn: int):
+        if move not in self.get_available_moves(other_pieces, turn):
             raise InvalidMoveException()
 
-        self.moves.append(Move(self.pos, pos, turn))
+        self.moves.append(move)
 
-        self.pos = pos
+        self.pos = move.new_pos
 
     def get_moves(self) -> list[Move]:
         return self.moves
 
     @available_moves_time
-    def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[int]:
+    def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[Move]:
         # TODO: finish
         if turn == self.last_computed_turn:
             debug("using pre-computed available moves")

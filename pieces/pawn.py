@@ -20,23 +20,6 @@ class Pawn(Piece):
 
         self.VALUE: int = 1
 
-    def move(self, move: Move, other_pieces: list[Piece], turn: int):
-        is_legit = False
-        for pos in self.get_available_moves(other_pieces, turn):
-            if pos == move:
-                is_legit = True
-                break
-
-        if not is_legit:
-            raise InvalidMoveException("Provided move is illegal!")
-
-        self.moves.append(move)
-
-        self.pos = move.new_pos
-
-    def get_moves(self) -> list[Move]:
-        return self.moves
-
     @available_moves_time
     def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[Move]:
         """
@@ -140,12 +123,3 @@ class Pawn(Piece):
         debug("computed available moves")
 
         return self.available_moves
-
-    def get_pos(self) -> int:
-        return self.pos
-
-    def get_name(self):
-        return self.name
-
-    def get_color(self):
-        return self.color

@@ -1,7 +1,7 @@
 from .piece import Piece
 from .color import Color, BLACK, WHITE
 from .move import Move
-from .exceptions import InvalidColorException, InvalidMoveException
+from .exceptions import InvalidColorException
 from logging import debug
 from .decorators import available_moves_time
 
@@ -20,17 +20,6 @@ class Bishop(Piece):
 
         self.VALUE = 3
 
-    def move(self, pos: int, other_pieces: list[Piece], turn: int):
-        if pos not in self.get_available_moves(other_pieces, turn):
-            raise InvalidMoveException()
-
-        self.moves.append(Move(self.pos, pos, turn))
-
-        self.pos = pos
-
-    def get_moves(self) -> list[Move]:
-        return self.moves
-
     @available_moves_time
     def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[int]:
         # TODO: finish
@@ -43,12 +32,3 @@ class Bishop(Piece):
         debug("computed available moves")
 
         return self.available_moves
-
-    def get_pos(self) -> int:
-        return self.pos
-
-    def get_name(self):
-        return self.name
-
-    def get_color(self):
-        return self.color
