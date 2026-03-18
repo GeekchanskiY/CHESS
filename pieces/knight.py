@@ -33,7 +33,7 @@ class Knight(Piece):
 
         for offset in offsets:
             new_pos = self.pos + offset
-            
+
             if not is_pos_in_bounds(new_pos):
                 continue
 

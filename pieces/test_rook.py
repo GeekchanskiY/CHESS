@@ -6,26 +6,6 @@ from .color import BLACK, WHITE
 from .move import Move
 
 
-class DummyPiece:
-    def __init__(self, pos, color, name="P", moves=None):
-        self._pos = pos
-        self._color = color
-        self._name = name
-        self._moves = moves or []
-
-    def get_pos(self):
-        return self._pos
-
-    def get_color(self):
-        return self._color
-
-    def get_name(self):
-        return self._name
-
-    def get_moves(self):
-        return self._moves
-
-
 # --- BASIC MOVEMENT ---
 
 
@@ -71,7 +51,7 @@ def test_rook_cannot_move_diagonal():
 
 def test_rook_blocked_by_same_color():
     rook = Rook(pos=55, color=WHITE)
-    blocker = DummyPiece(pos=54, color=WHITE)
+    blocker = Rook(pos=54, color=WHITE)
 
     moves = rook.get_available_moves(other_pieces=[blocker], turn=1)
 
@@ -81,7 +61,7 @@ def test_rook_blocked_by_same_color():
 
 def test_rook_blocked_by_enemy_and_can_capture():
     rook = Rook(pos=55, color=WHITE)
-    enemy = DummyPiece(pos=54, color=BLACK)
+    enemy = Rook(pos=54, color=BLACK)
 
     moves = rook.get_available_moves(other_pieces=[enemy], turn=1)
 
@@ -94,7 +74,7 @@ def test_rook_blocked_by_enemy_and_can_capture():
 
 def test_rook_capture_vertical():
     rook = Rook(pos=55, color=WHITE)
-    enemy = DummyPiece(pos=45, color=BLACK)
+    enemy = Rook(pos=45, color=BLACK)
 
     moves = rook.get_available_moves(other_pieces=[enemy], turn=1)
 
@@ -103,7 +83,7 @@ def test_rook_capture_vertical():
 
 def test_rook_cannot_capture_same_color():
     rook = Rook(pos=55, color=WHITE)
-    ally = DummyPiece(pos=45, color=WHITE)
+    ally = Rook(pos=45, color=WHITE)
 
     moves = rook.get_available_moves(other_pieces=[ally], turn=1)
 

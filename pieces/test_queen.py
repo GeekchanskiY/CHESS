@@ -6,26 +6,6 @@ from .color import BLACK, WHITE
 from .move import Move
 
 
-class DummyPiece:
-    def __init__(self, pos, color, name="P", moves=None):
-        self._pos = pos
-        self._color = color
-        self._name = name
-        self._moves = moves or []
-
-    def get_pos(self):
-        return self._pos
-
-    def get_color(self):
-        return self._color
-
-    def get_name(self):
-        return self._name
-
-    def get_moves(self):
-        return self._moves
-
-
 # --- BASIC MOVEMENT ---
 
 
@@ -75,7 +55,7 @@ def test_queen_moves_straight_and_diagonal():
 
 def test_queen_blocked_by_same_color():
     queen = Queen(pos=55, color=WHITE)
-    blocker = DummyPiece(pos=54, color=WHITE)
+    blocker = Queen(pos=54, color=WHITE)
 
     moves = queen.get_available_moves(other_pieces=[blocker], turn=1)
 
@@ -85,7 +65,7 @@ def test_queen_blocked_by_same_color():
 
 def test_queen_blocked_by_enemy_and_can_capture():
     queen = Queen(pos=55, color=WHITE)
-    enemy = DummyPiece(pos=54, color=BLACK)
+    enemy = Queen(pos=54, color=BLACK)
 
     moves = queen.get_available_moves(other_pieces=[enemy], turn=1)
 
@@ -98,7 +78,7 @@ def test_queen_blocked_by_enemy_and_can_capture():
 
 def test_queen_capture_diagonal():
     queen = Queen(pos=55, color=WHITE)
-    enemy = DummyPiece(pos=44, color=BLACK)
+    enemy = Queen(pos=44, color=BLACK)
 
     moves = queen.get_available_moves(other_pieces=[enemy], turn=1)
 
@@ -107,7 +87,7 @@ def test_queen_capture_diagonal():
 
 def test_queen_cannot_capture_same_color():
     queen = Queen(pos=55, color=WHITE)
-    ally = DummyPiece(pos=44, color=WHITE)
+    ally = Queen(pos=44, color=WHITE)
 
     moves = queen.get_available_moves(other_pieces=[ally], turn=1)
 

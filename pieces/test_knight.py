@@ -6,26 +6,6 @@ from .color import BLACK, WHITE
 from .move import Move
 
 
-class DummyPiece:
-    def __init__(self, pos, color, name="P", moves=None):
-        self._pos = pos
-        self._color = color
-        self._name = name
-        self._moves = moves or []
-
-    def get_pos(self):
-        return self._pos
-
-    def get_color(self):
-        return self._color
-
-    def get_name(self):
-        return self._name
-
-    def get_moves(self):
-        return self._moves
-
-
 # --- BASIC MOVEMENT ---
 
 
@@ -74,7 +54,7 @@ def test_knight_does_not_wrap_board():
 
 def test_knight_capture_enemy():
     knight = Knight(pos=55, color=WHITE)
-    enemy = DummyPiece(pos=34, color=BLACK)
+    enemy = Knight(pos=34, color=BLACK)
 
     moves = knight.get_available_moves(other_pieces=[enemy], turn=1)
 
@@ -83,7 +63,7 @@ def test_knight_capture_enemy():
 
 def test_knight_cannot_capture_same_color():
     knight = Knight(pos=55, color=WHITE)
-    ally = DummyPiece(pos=34, color=WHITE)
+    ally = Knight(pos=34, color=WHITE)
 
     moves = knight.get_available_moves(other_pieces=[ally], turn=1)
 
@@ -96,8 +76,8 @@ def test_knight_cannot_capture_same_color():
 def test_knight_mixed_pieces():
     knight = Knight(pos=55, color=WHITE)
 
-    enemy = DummyPiece(pos=34, color=BLACK)
-    ally = DummyPiece(pos=36, color=WHITE)
+    enemy = Knight(pos=34, color=BLACK)
+    ally = Knight(pos=36, color=WHITE)
 
     moves = knight.get_available_moves(other_pieces=[enemy, ally], turn=1)
 

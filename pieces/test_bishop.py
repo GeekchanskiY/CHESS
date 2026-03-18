@@ -6,26 +6,6 @@ from .color import BLACK, WHITE
 from .move import Move
 
 
-class DummyPiece:
-    def __init__(self, pos, color, name="P", moves=None):
-        self._pos = pos
-        self._color = color
-        self._name = name
-        self._moves = moves or []
-
-    def get_pos(self):
-        return self._pos
-
-    def get_color(self):
-        return self._color
-
-    def get_name(self):
-        return self._name
-
-    def get_moves(self):
-        return self._moves
-
-
 # --- BASIC MOVEMENT ---
 
 
@@ -72,7 +52,7 @@ def test_bishop_cannot_move_straight():
 
 def test_bishop_blocked_by_same_color():
     bishop = Bishop(pos=55, color=WHITE)
-    blocker = DummyPiece(pos=44, color=WHITE)
+    blocker = Bishop(pos=44, color=WHITE)
 
     moves = bishop.get_available_moves(other_pieces=[blocker], turn=1)
 
@@ -82,7 +62,7 @@ def test_bishop_blocked_by_same_color():
 
 def test_bishop_blocked_by_enemy_and_can_capture():
     bishop = Bishop(pos=55, color=WHITE)
-    enemy = DummyPiece(pos=44, color=BLACK)
+    enemy = Bishop(pos=44, color=BLACK)
 
     moves = bishop.get_available_moves(other_pieces=[enemy], turn=1)
 
@@ -95,7 +75,7 @@ def test_bishop_blocked_by_enemy_and_can_capture():
 
 def test_bishop_capture_other_diagonal():
     bishop = Bishop(pos=55, color=WHITE)
-    enemy = DummyPiece(pos=66, color=BLACK)
+    enemy = Bishop(pos=66, color=BLACK)
 
     moves = bishop.get_available_moves(other_pieces=[enemy], turn=1)
 
@@ -104,7 +84,7 @@ def test_bishop_capture_other_diagonal():
 
 def test_bishop_cannot_capture_same_color():
     bishop = Bishop(pos=55, color=WHITE)
-    ally = DummyPiece(pos=44, color=WHITE)
+    ally = Bishop(pos=44, color=WHITE)
 
     moves = bishop.get_available_moves(other_pieces=[ally], turn=1)
 
