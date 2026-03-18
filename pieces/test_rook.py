@@ -38,17 +38,17 @@ def test_rook_moves_straight():
         54,
         53,
         52,
-        51,  
+        51,
         56,
         57,
-        58,  
+        58,
         45,
         35,
         25,
-        15,  
+        15,
         65,
         75,
-        85,  
+        85,
     ]
 
     for pos in expected_positions:

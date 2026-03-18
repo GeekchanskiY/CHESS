@@ -4,6 +4,7 @@ from .move import Move
 from .exceptions import InvalidColorException, InvalidMoveException
 from logging import debug
 from .decorators import available_moves_time
+from .utils import is_pos_in_bounds
 
 
 class Knight(Piece):
@@ -20,35 +21,53 @@ class Knight(Piece):
 
         self.VALUE = 3
 
-    def move(self, move: Move, other_pieces: list[Piece], turn: int):
-        if move not in self.get_available_moves(other_pieces, turn):
-            raise InvalidMoveException()
-
-        self.moves.append(move)
-
-        self.pos = move.new_pos
-
-    def get_moves(self) -> list[Move]:
-        return self.moves
-
     @available_moves_time
     def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[Move]:
-        # TODO: finish
         if turn == self.last_computed_turn:
             debug("using pre-computed available moves")
             return self.available_moves
 
-        self.available_moves = [self.pos + 10] if self.color == BLACK else [self.pos - 10]
+        available_moves: list[Move] = []
+
+        offsets = [-21, -19, -12, -8, 8, 12, 19, 21]
+
+        for offset in offsets:
+            new_pos = self.pos + offset
+            
+            if not is_pos_in_bounds(new_pos):
+                continue
+
+            found = False
+            for piece in other_pieces:
+                if piece.get_pos() == new_pos:
+                    if piece.get_color() == self.color:
+                        found = True
+
+                        break
+                    else:
+                        available_moves.append(
+                            Move(
+                                prev_pos=self.pos,
+                                new_pos=new_pos,
+                                turn=turn,
+                                beats=new_pos,
+                            )
+                        )
+
+                        found = True
+                        break
+
+            if not found:
+                available_moves.append(
+                    Move(
+                        prev_pos=self.pos,
+                        new_pos=new_pos,
+                        turn=turn,
+                        beats=None,
+                    )
+                )
+
         self.last_computed_turn = turn
+        self.available_moves = available_moves
         debug("computed available moves")
-
         return self.available_moves
-
-    def get_pos(self) -> int:
-        return self.pos
-
-    def get_name(self):
-        return self.name
-
-    def get_color(self):
-        return self.color
