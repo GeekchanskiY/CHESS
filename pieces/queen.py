@@ -23,7 +23,7 @@ class Queen(Piece):
     def move(self, pos: int, other_pieces: list[Piece], turn: int):
         if pos not in self.get_available_moves(other_pieces, turn):
             raise InvalidMoveException()
-        
+
         self.moves.append(Move(self.pos, pos, turn))
 
         self.pos = pos
@@ -37,13 +37,12 @@ class Queen(Piece):
         if turn == self.last_computed_turn:
             debug("using pre-computed available moves")
             return self.available_moves
-        
+
         self.available_moves = [self.pos + 10] if self.color == BLACK else [self.pos - 10]
         self.last_computed_turn = turn
         debug("computed available moves")
 
         return self.available_moves
-
 
     def get_pos(self) -> int:
         return self.pos

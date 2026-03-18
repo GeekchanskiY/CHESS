@@ -146,7 +146,12 @@ class Game:
 
         piece = self._get_piece_on_tile(pos)
         if piece:
-            if self.board.turn % 2 == 0 and piece.get_color() == WHITE or self.board.turn % 2 == 1 and piece.get_color() == BLACK:
+            if (
+                self.board.turn % 2 == 0
+                and piece.get_color() == WHITE
+                or self.board.turn % 2 == 1
+                and piece.get_color() == BLACK
+            ):
                 self._select_piece(self._mouse_pos())
                 self._draw()
 
