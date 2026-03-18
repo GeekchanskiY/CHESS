@@ -33,6 +33,7 @@ class Pawn(Piece):
 
     @available_moves_time
     def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[int]:
+        # TODO: finish
         if turn == self.last_computed_turn:
             debug("using pre-computed available moves")
             return self.available_moves

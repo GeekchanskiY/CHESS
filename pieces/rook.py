@@ -2,6 +2,8 @@ from .piece import Piece
 from .color import Color, BLACK, WHITE
 from .move import Move
 from .exceptions import InvalidColorException, InvalidMoveException
+from logging import debug
+from .decorators import available_moves_time
 
 
 class Rook(Piece):
@@ -13,17 +15,35 @@ class Rook(Piece):
         self.moves: list[Move] = []
         self.color = color
         self.name = "R"
+        self.last_computed_turn: int = -1
+        self.available_moves: list[int] = []
 
-    def move(self, pos: int, other_pieces: list[Piece]):
-        if pos not in self.get_available_moves(other_pieces):
+        self.VALUE = 5
+
+    def move(self, pos: int, other_pieces: list[Piece], turn: int):
+        if pos not in self.get_available_moves(other_pieces, turn):
             raise InvalidMoveException()
-        pass
+        
+        self.moves.append(Move(self.pos, pos, turn))
+
+        self.pos = pos
 
     def get_moves(self) -> list[Move]:
-        return []
+        return self.moves
 
-    def get_available_moves(self, other_pieces: list[Piece]) -> list[int]:
-        return []
+    @available_moves_time
+    def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[int]:
+        # TODO: finish
+        if turn == self.last_computed_turn:
+            debug("using pre-computed available moves")
+            return self.available_moves
+        
+        self.available_moves = [self.pos + 10] if self.color == BLACK else [self.pos - 10]
+        self.last_computed_turn = turn
+        debug("computed available moves")
+
+        return self.available_moves
+
 
     def get_pos(self) -> int:
         return self.pos

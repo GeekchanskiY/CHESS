@@ -8,7 +8,6 @@ def available_moves_time(func):
     def wrapper(self, *args, **kwargs):
         start = time.perf_counter()
 
-        # try to extract `turn`
         turn = kwargs.get("turn")
         if turn is None and len(args) > 1:
             turn = args[1]
