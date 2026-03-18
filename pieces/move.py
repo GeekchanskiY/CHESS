@@ -8,3 +8,4 @@ class Move:
     prev_pos: int
     new_pos: int
     turn: int
+    beats: int | None

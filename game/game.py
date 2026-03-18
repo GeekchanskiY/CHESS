@@ -7,6 +7,7 @@ from .tile import Tile
 from .assets import Assets
 from pieces.piece import Piece
 from pieces.color import BLACK, WHITE
+from pieces.move import Move
 
 from logging import debug
 
@@ -53,7 +54,7 @@ class Game:
 
         # Game state
         self.selected_piece = None
-        self.available_moves = []
+        self.available_moves: list[Move] = []
 
     # DRAW METHODS (TODO: move to separate class)
 
@@ -68,7 +69,7 @@ class Game:
         """Draws hints for selected piece"""
 
         for move in self.available_moves:
-            self.surface.blit(pygame.image.load(self.assets.get_hint_image()), self._get_pos(move))
+            self.surface.blit(pygame.image.load(self.assets.get_hint_image()), self._get_pos(move.new_pos))
 
     def _draw(self):
         """Draws tiles and pieces"""
@@ -137,8 +138,11 @@ class Game:
 
         pos = self._mouse_pos()
         if self.selected_piece != None:
-            if pos in self.available_moves:
-                self.board.make_turn(self.selected_piece, pos)
+            for move in self.available_moves:
+                if move.new_pos != pos:
+                    continue
+
+                self.board.make_turn(self.selected_piece, move)
                 self._clear_cursor()
                 self._draw()
 
