@@ -1,10 +1,9 @@
 from .piece import Piece
-from .color import Color, BLACK, WHITE
+from .color import Color
 from .move import Move
 from .exceptions import InvalidColorException
 from logging import debug
 from .decorators import available_moves_time
-from .utils import is_pos_in_bounds
 
 
 class Rook(Piece):

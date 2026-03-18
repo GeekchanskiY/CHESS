@@ -39,7 +39,7 @@ class Piece(ABC):
             pos: int = self.get_pos() + offset
 
             while is_pos_in_bounds(pos):
-                break_found = False
+                break_found: bool = False
                 for piece in other_pieces:
                     if piece.get_pos() == pos:
                         if piece.get_color() != self.get_color():
