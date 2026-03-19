@@ -1,7 +1,7 @@
 from .piece import Piece
-from .color import Color, BLACK, WHITE
+from .color import Color
 from .move import Move
-from .exceptions import InvalidColorException, InvalidMoveException
+from .exceptions import InvalidColorException
 from logging import debug
 from .decorators import available_moves_time
 
@@ -22,11 +22,15 @@ class Queen(Piece):
 
     @available_moves_time
     def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[int]:
+        moves = self._get_last_computed_turn(turn)
+        if moves is not None:
+            return moves
+
         if turn == self.last_computed_turn:
             debug("using pre-computed available moves")
             return self.available_moves
 
-        self.available_moves = self._walk_positions(other_pieces, turn, (-11, -9, 11, 9, -1, 1, 10, -10))
-        self.last_computed_turn = turn
+        moves = self._walk_positions(other_pieces, turn, (-11, -9, 11, 9, -1, 1, 10, -10))
+        self._save_computed_turn(turn, moves)
 
-        return self.available_moves
+        return moves

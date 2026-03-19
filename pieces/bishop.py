@@ -22,10 +22,11 @@ class Bishop(Piece):
 
     @available_moves_time
     def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[int]:
+        moves = self._get_last_computed_turn(turn)
         if turn == self.last_computed_turn:
             debug("using pre-computed available moves")
             return self.available_moves
 
-        self.available_moves = self._walk_positions(other_pieces, turn, (-11, -9, 11, 9))
-        self.last_computed_turn = turn
-        return self.available_moves
+        moves = self._walk_positions(other_pieces, turn, (-11, -9, 11, 9))
+        self._save_computed_turn(turn, moves)
+        return moves

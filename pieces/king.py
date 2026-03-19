@@ -22,13 +22,12 @@ class King(Piece):
 
     @available_moves_time
     def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[int]:
-        # TODO: finish
-        if turn == self.last_computed_turn:
+        moves = self._get_last_computed_turn(turn)
+        if moves is not None:
             debug("using pre-computed available moves")
             return self.available_moves
 
-        self.available_moves = [self.pos + 10] if self.color == BLACK else [self.pos - 10]
-        self.last_computed_turn = turn
-        debug("computed available moves")
-
-        return self.available_moves
+        moves = []
+        self._save_computed_turn(turn, moves)
+        debug("computed moves")
+        return moves

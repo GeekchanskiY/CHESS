@@ -3,6 +3,7 @@ from .color import Color
 from .move import Move
 from .exceptions import InvalidMoveException, InvalidColorException
 from .utils import is_pos_in_bounds
+from logging import debug
 
 
 class Piece(ABC):
@@ -71,3 +72,21 @@ class Piece(ABC):
                 pos += offset
 
         return available_moves
+
+    def _get_last_computed_turn(self, turn: int) -> list[Move] | None:
+        """Gets last computed turn if exists. If turn = -1 forces to re-compute moves."""
+        if turn == -1:
+            return None
+
+        if turn == self.last_computed_turn:
+            debug("using pre-computed available moves")
+            return self.available_moves
+
+    def _save_computed_turn(self, turn: int, moves: list[Move]):
+        """Saves computed turn to cache. Ignores if turn equals -1."""
+        if turn == -1:
+            return
+
+        debug("saving computed moves")
+        self.last_computed_turn = turn
+        self.available_moves = moves
