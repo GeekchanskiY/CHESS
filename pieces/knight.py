@@ -23,9 +23,10 @@ class Knight(Piece):
 
     @available_moves_time
     def get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[Move]:
-        if turn == self.last_computed_turn:
+        moves = self._get_last_computed_turn(turn)
+        if moves is not None:
             debug("using pre-computed available moves")
-            return self.available_moves
+            return moves
 
         available_moves: list[Move] = []
 
@@ -67,7 +68,6 @@ class Knight(Piece):
                     )
                 )
 
-        self.last_computed_turn = turn
-        self.available_moves = available_moves
+        self._save_computed_turn(turn, moves)
         debug("computed available moves")
-        return self.available_moves
+        return available_moves
