@@ -90,3 +90,13 @@ class Piece(ABC):
         debug("saving computed moves")
         self.last_computed_turn = turn
         self.available_moves = moves
+
+    def __eq__(self, value):
+        if type(value) != type(self):
+            return False
+
+        return (
+            self.get_color() == value.get_color()
+            and self.get_name() == value.get_name()
+            and self.get_pos() == value.get_pos()
+        )
