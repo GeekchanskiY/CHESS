@@ -30,3 +30,6 @@ class Bishop(Piece):
         moves = self._walk_positions(other_pieces, turn, (-11, -9, 11, 9))
         self._save_computed_turn(turn, moves)
         return moves
+
+    def _force_get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[Move]:
+        return self.get_available_moves(other_pieces, turn)

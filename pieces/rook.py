@@ -32,3 +32,6 @@ class Rook(Piece):
         self._save_computed_turn(turn, moves)
 
         return moves
+    
+    def _force_get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[Move]:
+        return self.get_available_moves(other_pieces, turn)

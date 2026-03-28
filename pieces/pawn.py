@@ -122,3 +122,7 @@ class Pawn(Piece):
         debug("computed available moves")
 
         return available_moves
+    
+    def _force_get_available_moves(self, other_pieces: list[Piece], turn: int) -> list[Move]:
+        return self.get_available_moves(other_pieces, turn)
+

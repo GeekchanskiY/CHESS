@@ -71,3 +71,25 @@ class Knight(Piece):
         self._save_computed_turn(turn, moves)
         debug("computed available moves")
         return available_moves
+    
+    def _force_get_available_moves(self, other_pieces: list["Piece"], turn: int) -> list[Move]:
+        available_moves: list[Move] = []
+
+        offsets = [-21, -19, -12, -8, 8, 12, 19, 21]
+
+        for offset in offsets:
+            new_pos = self.pos + offset
+
+            if not is_pos_in_bounds(new_pos):
+                continue
+
+            available_moves.append(
+                Move(
+                    prev_pos=self.pos,
+                    new_pos=new_pos,
+                    turn=turn,
+                    beats=None,
+                )
+            )
+
+        return available_moves
